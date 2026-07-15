@@ -97,12 +97,16 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-border pt-8 flex flex-col md:flex-row items-center justify-between">
-          <p className="text-xs text-gray-text mb-4 md:mb-0">
+          <p className="text-xs text-gray-text mb-4 md:mb-0 text-center md:text-left">
             &copy; {new Date().getFullYear()} Metland Cikarang. Hak Cipta Dilindungi.
           </p>
-          <div className="flex space-x-6">
-            <Link href="#" className="text-xs text-gray-text hover:text-white transition-colors">Syarat & Ketentuan</Link>
-            <Link href="#" className="text-xs text-gray-text hover:text-white transition-colors">Kebijakan Privasi</Link>
+          <div className="flex flex-wrap justify-center md:justify-end gap-x-6 gap-y-3">
+            <Link href="/about" className="text-xs text-gray-text hover:text-white transition-colors">Tentang Kami</Link>
+            <Link href="/changelog" className="text-xs text-emerald-500/80 hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Fitur Log
+            </Link>
+            <Link href="/legal/terms" className="text-xs text-gray-text hover:text-white transition-colors">Syarat & Ketentuan</Link>
+            <Link href="/legal/privacy" className="text-xs text-gray-text hover:text-white transition-colors">Kebijakan Privasi</Link>
           </div>
         </div>
       </div>
