@@ -432,7 +432,7 @@ export default function SMIPage() {
                 <motion.p 
                   animate={{ opacity: [0.7, 1, 0.7] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="text-sm md:text-base font-medium tracking-widest uppercase text-emerald-500/80"
+                  className="text-sm md:text-base font-bold tracking-widest uppercase text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-200 to-cyan-400 drop-shadow-sm mt-2"
                 >
                   Smart Metland Intelligence
                 </motion.p>
@@ -800,23 +800,20 @@ export default function SMIPage() {
                           sendMessage(input);
                         }
                       }}
-                      placeholder="Describe an app and let Gemini do the rest"
-                      className="relative flex-grow bg-transparent pl-4 pr-16 py-4 text-[15px] text-white focus:outline-none placeholder:text-gray-500 font-light z-10"
+                      placeholder="Ketik pertanyaan Anda di sini..."
+                      className="relative flex-grow bg-transparent pl-4 pr-14 py-4 text-[15px] text-white focus:outline-none placeholder:text-gray-500 font-light z-10"
                       disabled={isLoading}
                       autoFocus
                     />
                     <button
                       type="submit"
                       disabled={isLoading || (!input.trim() && attachments.length === 0)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 h-10 px-4 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 hover:scale-105 disabled:bg-transparent disabled:text-gray-600 disabled:hover:scale-100 disabled:cursor-not-allowed transition-all duration-300 z-10 gap-2 border border-white/5"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 hover:text-emerald-300 hover:scale-105 disabled:bg-transparent disabled:text-gray-600 disabled:hover:scale-100 disabled:cursor-not-allowed transition-all duration-300 z-10"
                     >
                       {isLoading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-5 h-5 animate-spin" />
                       ) : (
-                        <>
-                          <span className="text-blue-400 text-lg leading-none">✦</span>
-                          <span className="text-sm font-medium">I'm feeling lucky</span>
-                        </>
+                        <Send size={18} className="-ml-0.5" />
                       )}
                     </button>
                   </div>
