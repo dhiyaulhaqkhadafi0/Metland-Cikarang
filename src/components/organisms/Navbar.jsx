@@ -77,9 +77,9 @@ export default function Navbar() {
           <button className="flex items-center justify-center w-10 h-10 rounded-full border border-border hover:border-primary text-gray-text hover:text-primary transition-all hover:shadow-emerald-glow">
             <User size={18} />
           </button>
-          <button className="px-6 py-2.5 rounded-full bg-gradient-to-r from-primary to-emerald-600 text-white font-medium text-sm shadow-emerald-glow hover:shadow-lg hover:scale-105 transition-all">
-            Booking Visit
-          </button>
+          <Link href="/login" className="px-6 py-2.5 rounded-full bg-gradient-to-r from-primary to-emerald-600 text-white font-medium text-sm shadow-emerald-glow hover:shadow-lg hover:scale-105 transition-all">
+            Portal Login
+          </Link>
         </div>
 
         {/* Mobile Toggle */}
@@ -108,9 +108,9 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
-          <button className="mt-4 w-full px-6 py-3 rounded-xl bg-primary text-white font-medium text-center">
-            Booking Visit
-          </button>
+          <Link href="/login" className="mt-4 w-full px-6 py-3 rounded-xl bg-primary text-white font-medium text-center block">
+            Portal Login
+          </Link>
         </motion.div>
       )}
     </motion.header>
