@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Scale, Calculator, BookOpen, ChevronRight, Calculator as CalcIcon, MessageSquare, Send, Cpu, Loader2, ArrowRight, X, Info } from "lucide-react";
+import { Scale, Calculator, BookOpen, ChevronRight, Calculator as CalcIcon, MessageSquare, Send, Cpu, Loader2, ArrowRight, X, Info, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
