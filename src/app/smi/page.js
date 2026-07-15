@@ -1,6 +1,6 @@
 "use client";
 
-import { User, Send, Cpu, ChevronRight, Lock, Search, GitCompare, Microchip, Loader2, Paperclip, Image as ImageIcon, HardDrive, Copy, ThumbsUp, ThumbsDown, Download, X, ArrowLeft, Landmark, RefreshCw } from "lucide-react";
+import { User, Send, Cpu, ChevronRight, Lock, Search, GitCompare, Microchip, Loader2, Paperclip, Image as ImageIcon, HardDrive, Copy, ThumbsUp, ThumbsDown, Download, X, ArrowLeft, Landmark, RefreshCw, Scale } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/organisms/Navbar";
@@ -12,6 +12,7 @@ import { supabase } from "@/lib/supabase";
 import useDrivePicker from "react-google-drive-picker";
 import SmartFinderCapability from "@/components/smi/SmartFinderCapability";
 import SmartComparisonCapability from "@/components/smi/SmartComparisonCapability";
+import SmartLegalExplainerCapability from "@/components/smi/SmartLegalExplainerCapability";
 
 // Feature Cards for the Hub
 const FEATURES = [
@@ -47,6 +48,14 @@ const FEATURES = [
     status: "Active",
     action: "Mulai Analisis",
     link: "/smi/kpr-advisor"
+  },
+  {
+    id: "legal",
+    title: "Smart Legal Explainer",
+    description: "Pahami tahapan legal, istilah properti, dan estimasi biaya (BPHTB, AJB, dll).",
+    icon: Scale,
+    status: "Active",
+    action: "Mulai Konsultasi Legal"
   }
 ];
 
@@ -368,9 +377,26 @@ export default function SMIPage() {
 
       <div className="flex-grow pt-24 pb-12 flex flex-col items-center justify-center container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Apple-like Ambient Glows */}
-        <div className="fixed top-1/3 left-1/4 w-[40vw] h-[40vw] bg-emerald-500/5 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
-        <div className="fixed bottom-1/3 right-1/4 w-[30vw] h-[30vw] bg-blue-500/5 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
+        {/* Apple-like Ambient Glows & Dynamic Background Particles */}
+        <motion.div 
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3], rotate: [0, 90, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="fixed top-1/4 left-1/4 w-[40vw] h-[40vw] bg-gradient-to-br from-emerald-600/10 to-teal-900/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen" 
+        />
+        <motion.div 
+          animate={{ scale: [1, 1.5, 1], opacity: [0.2, 0.4, 0.2], rotate: [0, -90, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="fixed bottom-1/4 right-1/4 w-[45vw] h-[45vw] bg-gradient-to-br from-blue-600/10 to-indigo-900/10 rounded-full blur-[130px] pointer-events-none mix-blend-screen" 
+        />
+        <motion.div 
+          animate={{ y: [-20, 20, -20], opacity: [0.1, 0.3, 0.1] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[30vw] bg-gradient-to-b from-white/5 to-transparent rounded-full blur-[100px] pointer-events-none mix-blend-screen" 
+        />
+        
+        {/* Subtle grid pattern background */}
+        <div className="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
+        <div className="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_10%,transparent_100%)] pointer-events-none z-0" />
 
         <AnimatePresence mode="wait">
           
@@ -385,16 +411,32 @@ export default function SMIPage() {
               exit={{ opacity: 0, y: -20, filter: "blur(10px)", transition: { duration: 0.3 } }}
               className="w-full max-w-5xl flex flex-col items-center mt-10"
             >
-              <div className="text-center mb-16 space-y-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-br from-[#1c1c1e] to-[#0a0a0b] border border-white/5 shadow-[0_0_40px_rgba(255,255,255,0.03)] mb-4 ring-1 ring-white/10">
-                  <Cpu className="w-8 h-8 text-transparent bg-clip-text bg-gradient-to-br from-emerald-300 to-white stroke-emerald-100" />
-                </div>
-                <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500">
+              <div className="text-center mb-16 space-y-4 relative z-10">
+                <motion.div 
+                  animate={{ y: [-5, 5, -5], rotate: [-2, 2, -2] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-br from-[#1c1c1e] to-[#0a0a0b] border border-white/5 shadow-[0_0_40px_rgba(255,255,255,0.03)] mb-4 ring-1 ring-white/10 relative group"
+                >
+                  <div className="absolute inset-0 rounded-3xl bg-emerald-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                  <Cpu className="w-8 h-8 text-transparent bg-clip-text bg-gradient-to-br from-emerald-300 to-white stroke-emerald-100 relative z-10" />
+                </motion.div>
+                
+                <motion.h1 
+                  animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                  className="text-4xl md:text-7xl font-semibold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-white bg-[length:200%_auto]"
+                >
                   SMI
-                </h1>
-                <p className="text-sm md:text-base font-medium tracking-widest uppercase text-gray-500">
+                </motion.h1>
+                
+                <motion.p 
+                  animate={{ opacity: [0.7, 1, 0.7] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  className="text-sm md:text-base font-medium tracking-widest uppercase text-emerald-500/80"
+                >
                   Smart Metland Intelligence
-                </p>
+                </motion.p>
+                
                 <p className="max-w-2xl mx-auto text-gray-400 mt-6 text-lg font-light leading-relaxed">
                   Mesin pengambil keputusan terintegrasi. Dirancang untuk menganalisis kebutuhan finansial dan gaya hidup Anda secara komprehensif.
                 </p>
@@ -415,6 +457,8 @@ export default function SMIPage() {
                           setMode("finder");
                         } else if (feature.id === "comparison") {
                           setMode("comparison");
+                        } else if (feature.id === "legal") {
+                          setMode("legal");
                         } else {
                           setMode("chat");
                         }
@@ -518,7 +562,31 @@ export default function SMIPage() {
           )}
 
           {/* =========================================
-              STATE 4: AI PROPERTY CONSULTANT (CHAT)
+              STATE 4: SMART LEGAL EXPLAINER
+             ========================================= */}
+          {mode === "legal" && (
+            <motion.div
+              key="legal"
+              initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full max-w-5xl"
+            >
+              <div className="mb-4">
+                <button 
+                  onClick={() => setMode("dashboard")}
+                  className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-white transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Kembali ke Hub
+                </button>
+              </div>
+              <SmartLegalExplainerCapability onSwitchToConsultant={() => setMode("chat")} />
+            </motion.div>
+          )}
+
+          {/* =========================================
+              STATE 5: AI PROPERTY CONSULTANT (CHAT)
              ========================================= */}
           {mode === "chat" && (
             <motion.div
@@ -527,7 +595,7 @@ export default function SMIPage() {
               animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
               exit={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-4xl bg-[#0a0a0b]/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col h-[85vh] min-h-[600px] ring-1 ring-white/5"
+              className="w-full max-w-4xl bg-[#0a0a0b]/90 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col h-[85vh] min-h-[600px] ring-1 ring-white/5 relative z-20"
             >
               {/* Header */}
               <div className="px-6 py-4 border-b border-white/5 bg-black/40 flex items-center justify-between backdrop-blur-xl z-20 relative">
@@ -596,8 +664,8 @@ export default function SMIPage() {
 
                       <div className={`max-w-[85%] text-[15px] font-light leading-relaxed tracking-wide ${
                         m.role === "user"
-                          ? "bg-[#1c1c1e] text-gray-100 px-5 py-3.5 rounded-2xl rounded-tr-sm border border-white/5 shadow-md"
-                          : "text-gray-300 py-1 w-full"
+                          ? "bg-[#1c1c1e] text-gray-100 px-6 py-4 rounded-2xl rounded-tr-sm border border-white/5 shadow-md"
+                          : "text-gray-200 py-1 px-2 w-full"
                       }`}>
                         
                         {/* Display User Attachments */}
@@ -618,7 +686,7 @@ export default function SMIPage() {
                         {m.role === "user" ? (
                           m.content
                         ) : (
-                          <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-p:text-gray-300 prose-p:my-4 prose-headings:text-white prose-headings:font-medium prose-headings:tracking-tight prose-h1:text-xl prose-h1:mb-8 prose-h2:text-lg prose-h2:text-emerald-400 prose-h2:mt-10 prose-h2:mb-6 prose-h3:text-base prose-h3:text-gray-200 prose-h3:mt-8 prose-h3:mb-4 prose-hr:border-white/10 prose-hr:my-12 prose-strong:text-white prose-strong:font-semibold prose-ul:my-6 prose-li:my-2 prose-li:marker:text-emerald-500 prose-blockquote:border-l-2 prose-blockquote:border-emerald-500 prose-blockquote:bg-emerald-500/10 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-xl prose-blockquote:not-italic prose-blockquote:my-8 prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline">
+                          <div className="prose prose-invert max-w-none prose-p:leading-loose prose-p:text-gray-300 prose-p:my-6 prose-headings:text-white prose-headings:font-medium prose-headings:tracking-tight prose-h1:text-xl prose-h1:mb-8 prose-h2:text-lg prose-h2:text-emerald-400 prose-h2:mt-12 prose-h2:mb-6 prose-h3:text-base prose-h3:text-gray-200 prose-h3:mt-8 prose-h3:mb-4 prose-hr:border-white/10 prose-hr:my-12 prose-strong:text-white prose-strong:font-semibold prose-ul:my-6 prose-ul:space-y-4 prose-li:my-3 prose-li:leading-relaxed prose-li:marker:text-emerald-500 prose-blockquote:border-l-2 prose-blockquote:border-emerald-500 prose-blockquote:bg-emerald-500/10 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-xl prose-blockquote:not-italic prose-blockquote:my-8 prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline mt-2 space-y-6">
                             {m.content ? (
                               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                 {m.content}
@@ -698,9 +766,12 @@ export default function SMIPage() {
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="relative max-w-3xl mx-auto">
-                  <div className="relative group flex items-center bg-[#111113] border border-white/10 rounded-3xl p-1.5 focus-within:border-emerald-500/50 transition-all shadow-inner">
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-3xl blur opacity-0 group-focus-within:opacity-100 transition duration-500 pointer-events-none" />
+                <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto mt-2 mb-2">
+                  <div className="relative group flex items-center bg-[#0a0a0b] rounded-[2rem] p-1.5 transition-all shadow-2xl z-10">
+                    {/* Google AI Studio Style Animated Gradient Border */}
+                    <div className="absolute -inset-[2px] rounded-[2.1rem] bg-[conic-gradient(from_0deg,transparent_0_340deg,white_360deg)] animate-[spin_4s_linear_infinite] opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute -inset-[2px] rounded-[2.1rem] bg-[conic-gradient(from_180deg,transparent_0_340deg,white_360deg)] animate-[spin_4s_linear_infinite] opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute inset-0 bg-[#151518] rounded-[2rem] border border-white/10 group-focus-within:border-transparent transition-colors z-0" />
                     
                     {/* Attachment Icons */}
                     <div className="relative flex items-center gap-1 pl-2 pr-2 border-r border-white/10">
@@ -729,20 +800,23 @@ export default function SMIPage() {
                           sendMessage(input);
                         }
                       }}
-                      placeholder="Ketik profil atau unggah referensi..."
-                      className="relative flex-grow bg-transparent pl-4 pr-12 py-3 text-[15px] text-white focus:outline-none placeholder:text-gray-600 font-light"
+                      placeholder="Describe an app and let Gemini do the rest"
+                      className="relative flex-grow bg-transparent pl-4 pr-16 py-4 text-[15px] text-white focus:outline-none placeholder:text-gray-500 font-light z-10"
                       disabled={isLoading}
                       autoFocus
                     />
                     <button
                       type="submit"
                       disabled={isLoading || (!input.trim() && attachments.length === 0)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-white text-black hover:bg-gray-200 hover:scale-105 disabled:bg-[#1c1c1e] disabled:text-gray-600 disabled:hover:scale-100 disabled:cursor-not-allowed transition-all duration-300 shadow-md z-10"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 h-10 px-4 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 hover:scale-105 disabled:bg-transparent disabled:text-gray-600 disabled:hover:scale-100 disabled:cursor-not-allowed transition-all duration-300 z-10 gap-2 border border-white/5"
                     >
                       {isLoading ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
-                        <Send className="w-4 h-4 translate-x-[-1px] translate-y-[1px]" />
+                        <>
+                          <span className="text-blue-400 text-lg leading-none">✦</span>
+                          <span className="text-sm font-medium">I'm feeling lucky</span>
+                        </>
                       )}
                     </button>
                   </div>

@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { SMI_SYSTEM_PROMPT } from "@/lib/smi-knowledge";
+import { SMI_SYSTEM_PROMPT, LEGAL_SYSTEM_PROMPT } from "@/lib/smi-knowledge";
 
 // Models to try in order of preference
 const FALLBACK_MODELS = [
@@ -12,7 +12,7 @@ const FALLBACK_MODELS = [
 
 export async function POST(req) {
   try {
-    const { messages } = await req.json();
+    const { messages, context } = await req.json();
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -42,7 +42,7 @@ export async function POST(req) {
       try {
         const model = genAI.getGenerativeModel({
           model: modelName,
-          systemInstruction: SMI_SYSTEM_PROMPT,
+          systemInstruction: context === "legal" ? LEGAL_SYSTEM_PROMPT : SMI_SYSTEM_PROMPT,
         });
 
         const chat = model.startChat({ history });
