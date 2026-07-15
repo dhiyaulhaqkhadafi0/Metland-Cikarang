@@ -1,6 +1,6 @@
 "use client";
 
-import { User, Send, Cpu, ChevronRight, Lock, Search, GitCompare, Microchip, Loader2, Paperclip, Image as ImageIcon, HardDrive, Copy, ThumbsUp, ThumbsDown, Download, X, ArrowLeft, Landmark } from "lucide-react";
+import { User, Send, Cpu, ChevronRight, Lock, Search, GitCompare, Microchip, Loader2, Paperclip, Image as ImageIcon, HardDrive, Copy, ThumbsUp, ThumbsDown, Download, X, ArrowLeft, Landmark, RefreshCw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/organisms/Navbar";
@@ -87,6 +87,39 @@ export default function SMIPage() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState("");
+  const [isHistoryLoaded, setIsHistoryLoaded] = useState(false);
+
+  // Load chat history from sessionStorage on mount
+  useEffect(() => {
+    const saved = sessionStorage.getItem("smi_chat_messages");
+    if (saved) {
+      try {
+        setMessages(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse saved messages", e);
+      }
+    }
+    setIsHistoryLoaded(true);
+  }, []);
+
+  // Save chat history to sessionStorage when it changes
+  useEffect(() => {
+    if (!isHistoryLoaded) return;
+    if (messages.length === 1 && messages[0].id === "welcome") {
+      sessionStorage.removeItem("smi_chat_messages");
+    } else {
+      sessionStorage.setItem("smi_chat_messages", JSON.stringify(messages));
+    }
+  }, [messages, isHistoryLoaded]);
+
+  // Reset chat logic
+  const handleResetChat = () => {
+    if (window.confirm("Apakah Anda yakin ingin memulai sesi baru? Semua riwayat chat saat ini akan dihapus.")) {
+      setMessages([WELCOME_MESSAGE]);
+      setInput("");
+      setAttachments([]);
+    }
+  };
   
   // Attachments state
   const [attachments, setAttachments] = useState([]); // { url/base64, name, mimeType }
@@ -524,9 +557,21 @@ export default function SMIPage() {
                   </div>
                 </div>
                 
-                {/* Real-time Clock */}
-                <div className="text-[11px] font-medium text-gray-500 bg-white/5 border border-white/5 px-3 py-1.5 rounded-full backdrop-blur-md hidden sm:block">
-                  {currentTime || "Memuat waktu..."}
+                <div className="flex items-center gap-3">
+                  {/* Reset Chat Button */}
+                  <button
+                    onClick={handleResetChat}
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-full transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                    title="Mulai Sesi Baru"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Sesi Baru</span>
+                  </button>
+
+                  {/* Real-time Clock */}
+                  <div className="text-[11px] font-medium text-gray-500 bg-white/5 border border-white/5 px-3 py-1.5 rounded-full backdrop-blur-md hidden sm:block">
+                    {currentTime || "Memuat waktu..."}
+                  </div>
                 </div>
               </div>
 
