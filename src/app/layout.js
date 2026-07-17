@@ -3,6 +3,8 @@ import SchemaMarkup from "@/components/atoms/SchemaMarkup";
 import Navbar from "@/components/organisms/Navbar";
 import Footer from "@/components/organisms/Footer";
 import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -39,6 +41,8 @@ export default function RootLayout({ children }) {
         <SmoothScroll>
           {children}
         </SmoothScroll>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
