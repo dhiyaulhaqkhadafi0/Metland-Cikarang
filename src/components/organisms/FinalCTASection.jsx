@@ -31,10 +31,16 @@ export default function FinalCTASection() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <button className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-primary to-emerald-600 text-white font-semibold text-lg shadow-emerald-glow hover:scale-105 transition-transform flex items-center justify-center">
+              <button 
+                className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-primary to-emerald-600 text-white font-semibold text-lg shadow-emerald-glow hover:scale-105 transition-transform flex items-center justify-center"
+                suppressHydrationWarning
+              >
                 <CalendarDays className="w-5 h-5 mr-3" /> Booking Visit
               </button>
-              <button className="w-full sm:w-auto px-8 py-4 rounded-full bg-transparent border border-border text-light-text hover:border-primary hover:text-primary transition-colors font-semibold text-lg flex items-center justify-center">
+              <button 
+                className="w-full sm:w-auto px-8 py-4 rounded-full bg-transparent border border-border text-light-text hover:border-primary hover:text-primary transition-colors font-semibold text-lg flex items-center justify-center"
+                suppressHydrationWarning
+              >
                 <PhoneCall className="w-5 h-5 mr-3" /> Hubungi Sales
               </button>
             </div>

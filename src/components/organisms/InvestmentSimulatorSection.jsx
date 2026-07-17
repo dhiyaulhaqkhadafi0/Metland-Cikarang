@@ -95,6 +95,7 @@ export default function InvestmentSimulatorSection() {
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
               className="px-8 py-4 rounded-full bg-dark-card border border-primary text-primary hover:bg-primary hover:text-white transition-all font-semibold inline-flex items-center shadow-emerald-glow"
+              suppressHydrationWarning
             >
               Konsultasi KPR Gratis
             </motion.button>
@@ -132,6 +133,7 @@ export default function InvestmentSimulatorSection() {
                       value={formatRupiah(propertyPrice)}
                       onChange={handlePriceChange}
                       className="w-36 bg-dark-bg border border-border rounded px-3 py-1 text-primary font-semibold focus:outline-none focus:border-primary text-right"
+                      suppressHydrationWarning
                     />
                   </div>
                 </div>
@@ -144,6 +146,7 @@ export default function InvestmentSimulatorSection() {
                     setIsCalculated(false);
                   }}
                   className="w-full h-2 bg-dark-bg rounded-lg appearance-none cursor-pointer accent-primary"
+                  suppressHydrationWarning
                 />
               </div>
 
@@ -158,6 +161,7 @@ export default function InvestmentSimulatorSection() {
                       step="any"
                       onChange={handleDpChange}
                       className="w-20 bg-dark-bg border border-border rounded px-2 py-1 text-primary font-semibold focus:outline-none focus:border-primary text-right"
+                      suppressHydrationWarning
                     />
                     <span className="text-gray-text text-sm">%</span>
                   </div>
@@ -171,6 +175,7 @@ export default function InvestmentSimulatorSection() {
                     setIsCalculated(false);
                   }}
                   className="w-full h-2 bg-dark-bg rounded-lg appearance-none cursor-pointer accent-primary"
+                  suppressHydrationWarning
                 />
               </div>
 
@@ -185,6 +190,7 @@ export default function InvestmentSimulatorSection() {
                       step="any"
                       onChange={handleTenureChange}
                       className="w-20 bg-dark-bg border border-border rounded px-2 py-1 text-primary font-semibold focus:outline-none focus:border-primary text-right"
+                      suppressHydrationWarning
                     />
                     <span className="text-gray-text text-sm">Tahun</span>
                   </div>
@@ -198,6 +204,7 @@ export default function InvestmentSimulatorSection() {
                     setIsCalculated(false);
                   }}
                   className="w-full h-2 bg-dark-bg rounded-lg appearance-none cursor-pointer accent-primary"
+                  suppressHydrationWarning
                 />
               </div>
 
@@ -205,6 +212,7 @@ export default function InvestmentSimulatorSection() {
               <button 
                 onClick={() => setIsCalculated(true)}
                 className="w-full py-4 rounded-xl bg-gradient-to-r from-primary to-emerald-600 text-white font-bold tracking-wide hover:scale-[1.02] transition-transform shadow-emerald-glow"
+                suppressHydrationWarning
               >
                 Hitung Cicilan Sekarang
               </button>
