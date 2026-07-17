@@ -41,20 +41,31 @@ export default function LoginPage() {
   }
 
   useEffect(() => {
-    // Generate a secure random nonce for Google OIDC
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let generatedNonce = '';
-    for (let i = 0; i < 32; i++) {
-      generatedNonce += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    nonceRef.current = generatedNonce;
-
-    const initializeGoogle = () => {
+    const initializeGoogle = async () => {
       if (window.google) {
+        // Gunakan kembali nonce yang sudah dibuat jika sudah ada (menghindari masalah double-run StrictMode)
+        let rawNonce = nonceRef.current;
+        if (!rawNonce) {
+          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+          let generated = '';
+          for (let i = 0; i < 32; i++) {
+            generated += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+          rawNonce = generated;
+          nonceRef.current = rawNonce;
+        }
+
+        // Hashing raw nonce menggunakan SHA-256 untuk dikirim ke Google OIDC
+        const encoder = new TextEncoder();
+        const data = encoder.encode(rawNonce);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashedNonce = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+
         window.google.accounts.id.initialize({
           client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
           callback: handleGoogleCredentialResponse,
-          nonce: nonceRef.current,
+          nonce: hashedNonce, // Mengirimkan nonce hasil hash SHA-256 ke Google
           ux_mode: 'popup',
         });
         
