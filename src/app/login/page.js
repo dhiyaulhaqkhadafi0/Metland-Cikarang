@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/client'
 export default function LoginPage() {
   const router = useRouter()
   const supabase = createClient()
+  const nonceRef = useRef('')
   
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -28,6 +29,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithIdToken({
         provider: 'google',
         token: response.credential,
+        nonce: nonceRef.current,
       })
       if (error) throw error
       router.push('/dashboard')
@@ -39,11 +41,20 @@ export default function LoginPage() {
   }
 
   useEffect(() => {
+    // Generate a secure random nonce for Google OIDC
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let generatedNonce = '';
+    for (let i = 0; i < 32; i++) {
+      generatedNonce += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    nonceRef.current = generatedNonce;
+
     const initializeGoogle = () => {
       if (window.google) {
         window.google.accounts.id.initialize({
           client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
           callback: handleGoogleCredentialResponse,
+          nonce: nonceRef.current,
           ux_mode: 'popup',
         });
         
