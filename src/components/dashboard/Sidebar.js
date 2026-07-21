@@ -3,11 +3,12 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, Building2, LogOut, Search, Bell } from 'lucide-react'
+import { LayoutDashboard, Users, Building2, LogOut, Search, Bell, Link as LinkIcon } from 'lucide-react'
 
 const navItems = [
   { name: 'Beranda', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Lead Inbox', href: '/dashboard/leads', icon: Users },
+  { name: 'Campaign Links', href: '/dashboard/campaigns', icon: LinkIcon },
   { name: 'Ketersediaan Unit', href: '/dashboard/units', icon: Building2 },
 ]
 

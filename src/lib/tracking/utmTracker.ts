@@ -4,6 +4,7 @@ export interface TrackingData {
   utm_campaign: string | null;
   utm_content: string | null;
   utm_term: string | null;
+  ref_code: string | null;
   landing_page: string | null;
   full_url: string | null;
   referrer: string | null;
@@ -48,6 +49,7 @@ export const extractUTMAndDeviceInfo = (url: URL): TrackingData => {
     utm_campaign: searchParams.get('utm_campaign') || null,
     utm_content: searchParams.get('utm_content') || null,
     utm_term: searchParams.get('utm_term') || null,
+    ref_code: searchParams.get('ref_code') || null,
     landing_page: typeof window !== 'undefined' ? window.location.pathname : null,
     full_url: typeof window !== 'undefined' ? window.location.href : null,
     referrer: typeof document !== 'undefined' ? document.referrer : null,
@@ -81,6 +83,7 @@ export const saveTrackingData = (data: TrackingData) => {
       utm_campaign: data.utm_campaign || existing.utm_campaign || null,
       utm_content: data.utm_content || existing.utm_content || null,
       utm_term: data.utm_term || existing.utm_term || null,
+      ref_code: data.ref_code || existing.ref_code || null,
       // Catat halaman pertama mereka masuk sebagai landing_page
       landing_page: existing.landing_page || data.landing_page || null,
       referrer: existing.referrer || data.referrer || null,

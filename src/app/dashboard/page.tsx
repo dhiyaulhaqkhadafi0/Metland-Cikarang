@@ -1,28 +1,57 @@
-'use client'
-
 import React from 'react'
 import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
 import { Users, AlertCircle, Trophy, Plus, ArrowRight } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
 
-// Dummy data untuk awal (nantinya fetch dari Supabase)
-const recentLeads = [
-  { id: 1, name: 'Bapak Ahmad', project: 'Brassia Garden', status: 'baru', date: 'Hari ini, 09:30' },
-  { id: 2, name: 'Ibu Sarah', project: 'Weston Gateway', status: 'kontak', date: 'Hari ini, 08:15' },
-  { id: 3, name: 'Dr. Hendra', project: 'Brassia Garden', status: 'nego', date: 'Kemarin, 16:45' },
-  { id: 4, name: 'Dimas Aditya', project: 'Weston Gateway', status: 'follow_up', date: 'Kemarin, 14:20' },
-  { id: 5, name: 'Keluarga Wijaya', project: 'Brassia Garden', status: 'closing', date: '12 Jul 2026' },
-]
+export const dynamic = 'force-dynamic';
 
-export default function DashboardHome() {
+export default async function DashboardHome() {
+  const supabase = await createClient()
+  
+  // Fetch real data from Supabase
+  const { data: leads } = await supabase
+    .from('leads')
+    .select('*')
+    .order('created_at', { ascending: false })
+  
+  const allLeads = leads || [];
+  
+  // Hitung metrik
+  const totalLeads = allLeads.length;
+  const needFollowUp = allLeads.filter(l => l.status === 'New').length;
+  
+  // Closing bulan ini
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  const closingThisMonth = allLeads.filter(l => {
+    if (l.status !== 'Closing') return false;
+    const date = new Date(l.created_at);
+    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+  }).length;
+
+  const recentLeads = allLeads.slice(0, 5);
+
+  const getStatusColor = (status: string) => {
+    switch(status) {
+      case 'New': return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+      case 'Contacted': return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+      case 'Survey': return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+      case 'Negotiation': return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+      case 'Booked': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+      case 'Closing': return 'bg-green-500/10 text-green-400 border-green-500/20';
+      case 'Lost': return 'bg-red-500/10 text-red-400 border-red-500/20';
+      default: return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+    }
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Halo, Budi Pratama 👋</h1>
+          <h1 className="text-3xl font-bold text-white tracking-tight">Halo, Tim Sales 👋</h1>
           <p className="text-slate-400 mt-1">Selamat datang di Command Center. Berikut ringkasan performa Anda.</p>
         </div>
         <Link 
@@ -44,8 +73,8 @@ export default function DashboardHome() {
                 <Users className="text-blue-400" size={24} />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-400">Total Lead Saya</p>
-                <h3 className="text-3xl font-bold text-white mt-1">128</h3>
+                <p className="text-sm font-medium text-slate-400">Total Lead Masuk</p>
+                <h3 className="text-3xl font-bold text-white mt-1">{totalLeads}</h3>
               </div>
             </div>
           </CardContent>
@@ -59,8 +88,8 @@ export default function DashboardHome() {
                 <AlertCircle className="text-orange-400" size={24} />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-400">Perlu Follow-up</p>
-                <h3 className="text-3xl font-bold text-white mt-1">12</h3>
+                <p className="text-sm font-medium text-slate-400">Baru (New)</p>
+                <h3 className="text-3xl font-bold text-white mt-1">{needFollowUp}</h3>
               </div>
             </div>
           </CardContent>
@@ -75,7 +104,7 @@ export default function DashboardHome() {
               </div>
               <div>
                 <p className="text-sm font-medium text-slate-400">Closing Bulan Ini</p>
-                <h3 className="text-3xl font-bold text-emerald-400 mt-1">4</h3>
+                <h3 className="text-3xl font-bold text-emerald-400 mt-1">{closingThisMonth}</h3>
               </div>
             </div>
           </CardContent>
@@ -98,23 +127,25 @@ export default function DashboardHome() {
               <thead className="bg-white/[0.02] border-b border-white/10 text-slate-400 uppercase tracking-wider text-xs">
                 <tr>
                   <th className="px-6 py-4 font-semibold">Nama Prospek</th>
-                  <th className="px-6 py-4 font-semibold">Project</th>
+                  <th className="px-6 py-4 font-semibold">Sumber Traffic</th>
                   <th className="px-6 py-4 font-semibold">Status</th>
-                  <th className="px-6 py-4 font-semibold">Update Terakhir</th>
+                  <th className="px-6 py-4 font-semibold">Waktu Masuk</th>
                   <th className="px-6 py-4 font-semibold text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {recentLeads.map((lead) => (
+                {recentLeads.length > 0 ? recentLeads.map((lead: any) => (
                   <tr key={lead.id} className="hover:bg-white/[0.02] transition-colors group">
-                    <td className="px-6 py-4 font-medium text-white">{lead.name}</td>
-                    <td className="px-6 py-4 text-slate-300">{lead.project}</td>
+                    <td className="px-6 py-4 font-medium text-white">{lead.name || <span className="text-slate-500 italic">Belum Ada Nama</span>}</td>
+                    <td className="px-6 py-4 text-slate-300">{lead.utm_source || 'Organic'}</td>
                     <td className="px-6 py-4">
-                      <Badge variant={lead.status}>
-                        {lead.status.replace('_', ' ').toUpperCase()}
-                      </Badge>
+                      <span className={`px-2.5 py-1 rounded-md text-xs font-medium border ${getStatusColor(lead.status)}`}>
+                        {lead.status}
+                      </span>
                     </td>
-                    <td className="px-6 py-4 text-slate-400 text-xs">{lead.date}</td>
+                    <td className="px-6 py-4 text-slate-400 text-xs">
+                      {new Date(lead.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+                    </td>
                     <td className="px-6 py-4 text-right">
                       <Link 
                         href={`/dashboard/leads/${lead.id}`}
@@ -124,7 +155,13 @@ export default function DashboardHome() {
                       </Link>
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                      Belum ada lead masuk di tabel.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

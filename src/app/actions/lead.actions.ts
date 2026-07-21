@@ -21,6 +21,7 @@ export async function saveLeadAction(
       utm_campaign: trackingData.utm_campaign || null,
       utm_content: trackingData.utm_content || null,
       utm_term: trackingData.utm_term || null,
+      campaign_code: trackingData.ref_code || null,
       
       landing_page: trackingData.landing_page || null,
       full_url: trackingData.full_url || null,
