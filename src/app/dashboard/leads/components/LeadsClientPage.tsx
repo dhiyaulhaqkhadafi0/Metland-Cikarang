@@ -2,10 +2,11 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, List as ListIcon, KanbanSquare } from 'lucide-react';
 import LeadMetrics from './LeadMetrics';
 import LeadFilters from './LeadFilters';
 import LeadTable from './LeadTable';
+import PipelineBoard from './PipelineBoard';
 
 export interface Lead {
   id: string;
@@ -28,6 +29,7 @@ export interface Lead {
 }
 
 export default function LeadsClientPage({ initialLeads }: { initialLeads: Lead[] }) {
+  const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterProject, setFilterProject] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -78,18 +80,41 @@ export default function LeadsClientPage({ initialLeads }: { initialLeads: Lead[]
 
       <LeadMetrics leads={initialLeads} />
 
-      <LeadFilters 
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        filterProject={filterProject}
-        setFilterProject={setFilterProject}
-        filterStatus={filterStatus}
-        setFilterStatus={setFilterStatus}
-        filterDate={filterDate}
-        setFilterDate={setFilterDate}
-      />
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+        <div className="flex-1">
+          <LeadFilters 
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            filterProject={filterProject}
+            setFilterProject={setFilterProject}
+            filterStatus={filterStatus}
+            setFilterStatus={setFilterStatus}
+            filterDate={filterDate}
+            setFilterDate={setFilterDate}
+          />
+        </div>
+        
+        <div className="hidden md:flex bg-white/5 border border-white/10 rounded-lg p-1 self-start">
+          <button 
+            onClick={() => setViewMode('list')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${viewMode === 'list' ? 'bg-[#141b25] text-emerald-400 shadow-md border border-white/5' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
+          >
+            <ListIcon size={16} /> List
+          </button>
+          <button 
+            onClick={() => setViewMode('kanban')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${viewMode === 'kanban' ? 'bg-[#141b25] text-emerald-400 shadow-md border border-white/5' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
+          >
+            <KanbanSquare size={16} /> Kanban
+          </button>
+        </div>
+      </div>
 
-      <LeadTable leads={filteredLeads} />
+      {viewMode === 'list' ? (
+        <LeadTable leads={filteredLeads} />
+      ) : (
+        <PipelineBoard initialLeads={filteredLeads} />
+      )}
     </div>
   );
 }
