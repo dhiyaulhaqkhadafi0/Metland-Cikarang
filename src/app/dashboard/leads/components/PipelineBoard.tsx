@@ -10,6 +10,16 @@ import Link from 'next/link';
 // Pipeline stages (Harus sesuai dengan status database)
 const STAGES = ['New', 'Contacted', 'Survey', 'Negotiation', 'Booked', 'Closing', 'Lost'];
 
+const STAGE_LABELS: Record<string, string> = {
+  'New': 'Baru Masuk',
+  'Contacted': 'Sudah Dihubungi',
+  'Survey': 'Survei Lokasi',
+  'Negotiation': 'Negosiasi',
+  'Booked': 'Booking Fee',
+  'Closing': 'Sukses Closing',
+  'Lost': 'Gagal (Lost)'
+};
+
 export default function PipelineBoard({ initialLeads }: { initialLeads: any[] }) {
   const [columns, setColumns] = useState<Record<string, any[]>>({});
   const [isClient, setIsClient] = useState(false);
@@ -72,7 +82,7 @@ export default function PipelineBoard({ initialLeads }: { initialLeads: any[] })
           <div key={stage} className="flex-shrink-0 w-[300px] bg-[#0f151c] border border-white/5 rounded-xl flex flex-col shadow-lg">
             <div className={`p-4 border-t-4 ${getStageColor(stage)} rounded-t-xl bg-white/[0.02]`}>
               <div className="flex justify-between items-center">
-                <h3 className="font-bold text-white">{stage}</h3>
+                <h3 className="font-bold text-white">{STAGE_LABELS[stage] || stage}</h3>
                 <span className="text-xs font-bold text-slate-400 bg-white/10 px-2 py-0.5 rounded-full">
                   {columns[stage]?.length || 0}
                 </span>

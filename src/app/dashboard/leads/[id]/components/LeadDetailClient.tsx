@@ -10,6 +10,16 @@ import { updateLeadStatus, addLeadNote, createReminder, toggleReminderStatus } f
 
 const STAGES = ['New', 'Contacted', 'Survey', 'Negotiation', 'Booked', 'Closing', 'Lost'];
 
+const STAGE_LABELS: Record<string, string> = {
+  'New': 'Baru',
+  'Contacted': 'Dihubungi',
+  'Survey': 'Survei',
+  'Negotiation': 'Negosiasi',
+  'Booked': 'Booking',
+  'Closing': 'Closing',
+  'Lost': 'Gagal'
+};
+
 export default function LeadDetailClient({ 
   lead, 
   activities, 
@@ -114,7 +124,7 @@ export default function LeadDetailClient({
                     ${!isActive && !isPast ? 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/5' : ''}
                   `}
                 >
-                  {stage}
+                  {STAGE_LABELS[stage] || stage}
                 </button>
               );
             })}

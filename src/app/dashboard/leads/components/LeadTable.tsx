@@ -4,6 +4,16 @@ import { Phone, User } from 'lucide-react';
 import Link from 'next/link';
 import { Lead } from './LeadsClientPage';
 
+const STAGE_LABELS: Record<string, string> = {
+  'New': 'Baru Masuk',
+  'Contacted': 'Sudah Dihubungi',
+  'Survey': 'Survei Lokasi',
+  'Negotiation': 'Negosiasi',
+  'Booked': 'Booking Fee',
+  'Closing': 'Sukses Closing',
+  'Lost': 'Gagal (Lost)'
+};
+
 export default function LeadTable({ leads }: { leads: Lead[] }) {
   const getStatusColor = (status: string) => {
     switch(status) {
@@ -56,7 +66,7 @@ export default function LeadTable({ leads }: { leads: Lead[] }) {
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-2.5 py-1 rounded-md text-xs font-medium border ${getStatusColor(lead.status)}`}>
-                      {lead.status}
+                      {STAGE_LABELS[lead.status] || lead.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-slate-400 text-xs">
