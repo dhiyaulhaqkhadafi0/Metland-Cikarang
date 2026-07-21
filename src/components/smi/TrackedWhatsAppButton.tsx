@@ -34,7 +34,11 @@ export function TrackedWhatsAppButton({
 
       // 2. Simpan secara sinkron ke Supabase via Server Action (Tunggu hingga selesai)
       // Ini wajib di-await agar browser tidak membatalkan request (cancel fetch) saat berpindah ke app WhatsApp
-      await saveLeadAction(trackingData, { interest_cluster: clusterName });
+      const result = await saveLeadAction(trackingData, { interest_cluster: clusterName });
+      
+      if (result && !result.success) {
+        alert("DEBUG INFO - Gagal simpan ke DB: " + JSON.stringify(result.error));
+      }
 
     } catch (error) {
       console.error("Error saat menyimpan tracking:", error);
