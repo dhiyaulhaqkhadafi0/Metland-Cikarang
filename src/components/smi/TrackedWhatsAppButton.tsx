@@ -32,23 +32,21 @@ export function TrackedWhatsAppButton({
       // 1. Ambil data analitik dari memori browser
       const trackingData = getTrackingData() || {};
 
-      // 2. Simpan secara asinkron ke Supabase via Server Action
-      // (Kita tidak melakukan 'await' secara ketat agar redirect WA instan dan tidak memblokir user UX jika koneksi lambat)
-      saveLeadAction(trackingData, { interest_cluster: clusterName }).catch(err => {
-        console.error("Gagal merekam lead di background:", err);
-      });
+      // 2. Simpan secara sinkron ke Supabase via Server Action (Tunggu hingga selesai)
+      // Ini wajib di-await agar browser tidak membatalkan request (cancel fetch) saat berpindah ke app WhatsApp
+      await saveLeadAction(trackingData, { interest_cluster: clusterName });
 
     } catch (error) {
-      console.error("Error saat membaca tracking:", error);
+      console.error("Error saat menyimpan tracking:", error);
     } finally {
-      // 3. Langsung Redirect ke WhatsApp seketika
+      // 3. Langsung Redirect ke WhatsApp setelah data dipastikan terkirim
       const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
       window.open(waUrl, '_blank');
       
       // Reset ref setelah jeda singkat
       setTimeout(() => {
         isProcessingRef.current = false;
-      }, 2000);
+      }, 1500);
     }
   };
 
