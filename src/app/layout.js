@@ -5,6 +5,7 @@ import Footer from "@/components/organisms/Footer";
 import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { TrackingProvider } from "@/components/smi/TrackingProvider";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -38,9 +39,11 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <SchemaMarkup />
-        <SmoothScroll>
-          {children}
-        </SmoothScroll>
+        <TrackingProvider>
+          <SmoothScroll>
+            {children}
+          </SmoothScroll>
+        </TrackingProvider>
         <Analytics />
         <SpeedInsights />
       </body>

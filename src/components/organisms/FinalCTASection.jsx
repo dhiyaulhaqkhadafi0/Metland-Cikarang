@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight, CalendarDays, PhoneCall } from "lucide-react";
+import { TrackedWhatsAppButton } from "@/components/smi/TrackedWhatsAppButton";
 
 export default function FinalCTASection() {
   return (
@@ -31,18 +32,22 @@ export default function FinalCTASection() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <button 
+              <TrackedWhatsAppButton 
+                phoneNumber="6281946838791"
+                message="Halo Metland Cikarang, saya tertarik dan ingin menjadwalkan kunjungan (Booking Visit) ke lokasi."
                 className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-primary to-emerald-600 text-white font-semibold text-lg shadow-emerald-glow hover:scale-105 transition-transform flex items-center justify-center"
                 suppressHydrationWarning
               >
                 <CalendarDays className="w-5 h-5 mr-3" /> Booking Visit
-              </button>
-              <button 
+              </TrackedWhatsAppButton>
+              <TrackedWhatsAppButton 
+                phoneNumber="6281946838791"
+                message="Halo Tim Sales Metland Cikarang, saya ingin berkonsultasi mengenai properti."
                 className="w-full sm:w-auto px-8 py-4 rounded-full bg-transparent border border-border text-light-text hover:border-primary hover:text-primary transition-colors font-semibold text-lg flex items-center justify-center"
                 suppressHydrationWarning
               >
                 <PhoneCall className="w-5 h-5 mr-3" /> Hubungi Sales
-              </button>
+              </TrackedWhatsAppButton>
             </div>
           </div>
         </motion.div>
