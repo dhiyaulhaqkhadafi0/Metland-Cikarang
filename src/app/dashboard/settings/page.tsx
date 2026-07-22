@@ -87,14 +87,7 @@ export default function SettingsPage() {
 
         const initialRef = `REF-${(user.email ? user.email.split('@')[0] : 'SALES').toUpperCase()}`;
 
-        // Auto-fix: if avatar_url is in user_metadata, reset it immediately to prevent future 494 errors
-        if (user.user_metadata?.avatar_url) {
-          await supabase.auth.updateUser({
-            data: { avatar_url: null }
-          });
-        }
-        
-        // Load avatar from localStorage instead of Supabase cookie metadata
+        // Load avatar from localStorage
         const localAvatar = localStorage.getItem('sales_avatar_url');
         if (localAvatar) {
           setAvatarUrl(localAvatar);
@@ -126,8 +119,13 @@ export default function SettingsPage() {
       const compressedData = await compressImage(file);
       setAvatarUrl(compressedData);
       
-      // Persist lightweight compressed image to localStorage exclusively to bypass Supabase cookie limits
-      localStorage.setItem('sales_avatar_url', compressedData);
+      // Persist to localStorage
+      try {
+        localStorage.setItem('sales_avatar_url', compressedData);
+        window.dispatchEvent(new CustomEvent('avatar_updated', { detail: compressedData }));
+      } catch (err) {
+        console.error("localStorage setItem failed:", err);
+      }
       
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 3000);
@@ -143,7 +141,13 @@ export default function SettingsPage() {
     setAvatarUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
     
-    localStorage.removeItem('sales_avatar_url');
+    try {
+      localStorage.removeItem('sales_avatar_url');
+      window.dispatchEvent(new CustomEvent('avatar_updated', { detail: null }));
+    } catch (err) {
+      console.error("localStorage removeItem failed:", err);
+    }
+    
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 3000);
   };
@@ -154,6 +158,15 @@ export default function SettingsPage() {
     setIsSaved(false);
 
     try {
+      if (avatarUrl) {
+        try {
+          localStorage.setItem('sales_avatar_url', avatarUrl);
+          window.dispatchEvent(new CustomEvent('avatar_updated', { detail: avatarUrl }));
+        } catch (err) {
+          console.error("Failed to save avatar to localStorage:", err);
+        }
+      }
+
       await supabase.auth.updateUser({
         data: {
           full_name: formData.fullName,

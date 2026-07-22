@@ -47,6 +47,21 @@ export function TopBar({ isCollapsed, onToggleCollapse }: { isCollapsed?: boolea
       }
     }
     loadUser()
+
+    const handleAvatarUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<string | null>;
+      if (customEvent.detail !== undefined) {
+        setAvatarUrl(customEvent.detail);
+      } else {
+        const local = localStorage.getItem('sales_avatar_url');
+        setAvatarUrl(local);
+      }
+    };
+
+    window.addEventListener('avatar_updated', handleAvatarUpdate);
+    return () => {
+      window.removeEventListener('avatar_updated', handleAvatarUpdate);
+    };
   }, [])
 
   useEffect(() => {

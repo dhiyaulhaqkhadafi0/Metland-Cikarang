@@ -24,8 +24,9 @@ const DUMMY_OUTPUT = [
 export default function CopywriterClient() {
   // States
   const [objective, setObjective] = useState('');
-  const [category, setCategory] = useState('');
-  const [type, setType] = useState('');
+  // Set default category so types are available immediately
+  const [category, setCategory] = useState('social_media');
+  const [type, setType] = useState('ig_caption');
   const [cluster, setCluster] = useState('');
   const [tone, setTone] = useState('');
   const [prompt, setPrompt] = useState('');
@@ -37,15 +38,13 @@ export default function CopywriterClient() {
 
   // Filtered lists based on progressive disclosure
   const [availableCategories, setAvailableCategories] = useState(copywritingCategories);
-  const [availableTypes, setAvailableTypes] = useState<{id: string, label: string}[]>([]);
+  const [availableTypes, setAvailableTypes] = useState<{id: string, label: string}[]>(copywritingTypes['social_media'] || []);
 
   // Handlers for dynamic dropdowns
   useEffect(() => {
     if (objective) {
       const filteredCats = copywritingCategories.filter(cat => cat.objectives.includes(objective));
       setAvailableCategories(filteredCats.length > 0 ? filteredCats : copywritingCategories);
-      setCategory('');
-      setType('');
     } else {
       setAvailableCategories(copywritingCategories);
     }
@@ -53,8 +52,11 @@ export default function CopywriterClient() {
 
   useEffect(() => {
     if (category) {
-      setAvailableTypes(copywritingTypes[category] || []);
-      setType('');
+      const types = copywritingTypes[category] || [];
+      setAvailableTypes(types);
+      if (types.length > 0 && !types.some(t => t.id === type)) {
+        setType(types[0].id);
+      }
     } else {
       setAvailableTypes([]);
     }
@@ -84,7 +86,7 @@ export default function CopywriterClient() {
     <div className="flex flex-col min-h-screen bg-[#070A0E] animate-in fade-in duration-700">
       
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-[#0B0F14]/90 backdrop-blur-xl border-b border-white/5 p-6">
+      <div className="sticky top-0 z-40 bg-[#0B0F14]/90 backdrop-blur-xl border-b border-white/5 p-6 flex-shrink-0">
         <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 bg-opacity-10 border border-emerald-500/20 flex items-center justify-center">
@@ -107,16 +109,16 @@ export default function CopywriterClient() {
         </div>
       </div>
 
-      {/* Main 3-Column Layout */}
-      <div className="flex-grow p-6 h-[calc(100vh-100px)]">
-        <div className="max-w-screen-2xl mx-auto h-full flex flex-col lg:flex-row gap-6">
+      {/* Main Layout Container */}
+      <div className="flex-grow p-6">
+        <div className="max-w-screen-2xl mx-auto flex flex-col lg:flex-row gap-6 items-start">
           
-          {/* COLUMN 1: Settings Panel (Progressive Disclosure) */}
-          <div className="w-full lg:w-[350px] flex-shrink-0 flex flex-col gap-5 overflow-y-auto pr-2 pb-32 custom-scrollbar">
+          {/* COLUMN 1: Settings Panel */}
+          <div className="w-full lg:w-[360px] flex-shrink-0 flex flex-col gap-5">
             <Card className="bg-[#0B0F14] border border-white/5 p-5 shadow-xl">
               <h2 className="text-sm font-bold text-white uppercase tracking-wider mb-5 flex items-center gap-2">
                 <Target size={16} className="text-emerald-400" />
-                Sales Objective
+                Sales Objective (Opsional)
               </h2>
               
               <div className="space-y-4">
@@ -127,37 +129,35 @@ export default function CopywriterClient() {
                     onChange={(e) => setObjective(e.target.value)}
                     className="w-full bg-[#111822] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all appearance-none"
                   >
-                    <option value="">-- Pilih Tujuan --</option>
+                    <option value="">Semua Tujuan (General)</option>
                     {salesObjectives.map(obj => (
                       <option key={obj.id} value={obj.id}>{obj.label}</option>
                     ))}
                   </select>
                 </div>
 
-                {/* Categories - Only show clearly when objective is selected */}
-                <div className={`transition-all duration-500 ${!objective ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
+                {/* Categories - Always active */}
+                <div>
                   <label className="block text-xs font-medium text-slate-400 mb-2">Kategori Copywriting</label>
                   <select 
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full bg-[#111822] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all appearance-none"
+                    className="w-full bg-[#111822] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all appearance-none font-medium"
                   >
-                    <option value="">-- Pilih Kategori --</option>
                     {availableCategories.map(cat => (
                       <option key={cat.id} value={cat.id}>{cat.label}</option>
                     ))}
                   </select>
                 </div>
 
-                {/* Types */}
-                <div className={`transition-all duration-500 ${!category ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
+                {/* Types - Always active */}
+                <div>
                   <label className="block text-xs font-medium text-slate-400 mb-2">Jenis Spesifik</label>
                   <select 
                     value={type}
                     onChange={(e) => setType(e.target.value)}
-                    className="w-full bg-[#111822] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all appearance-none"
+                    className="w-full bg-[#111822] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all appearance-none font-medium"
                   >
-                    <option value="">-- Pilih Jenis --</option>
                     {availableTypes.map(t => (
                       <option key={t.id} value={t.id}>{t.label}</option>
                     ))}
