@@ -87,8 +87,6 @@ export default function SettingsPage() {
 
         const initialRef = `REF-${(user.email ? user.email.split('@')[0] : 'SALES').toUpperCase()}`;
 
-        const initialRef = `REF-${(user.email ? user.email.split('@')[0] : 'SALES').toUpperCase()}`;
-
         // Auto-fix: if avatar_url is in user_metadata, reset it immediately to prevent future 494 errors
         if (user.user_metadata?.avatar_url) {
           await supabase.auth.updateUser({
