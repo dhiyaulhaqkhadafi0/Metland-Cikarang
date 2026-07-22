@@ -31,6 +31,15 @@ export async function updateLeadStatus(leadId: string, newStatus: string) {
   try {
     const supabase = await createClient();
     
+    // Map UI status name to valid DB enum ('baru', 'follow_up', 'closing')
+    const lower = (newStatus || '').toLowerCase();
+    let dbStatus = 'follow_up';
+    if (lower === 'new' || lower === 'baru' || lower === 'baru masuk') {
+      dbStatus = 'baru';
+    } else if (lower === 'closing' || lower === 'sukses closing') {
+      dbStatus = 'closing';
+    }
+
     // Ambil status sebelumnya untuk log
     const { data: lead } = await supabase.from('leads').select('status').eq('id', leadId).single();
     const oldStatus = lead?.status || 'Unknown';
@@ -38,14 +47,14 @@ export async function updateLeadStatus(leadId: string, newStatus: string) {
     // Update status di tabel leads
     const { data, error } = await supabase
       .from('leads')
-      .update({ status: newStatus })
+      .update({ status: dbStatus })
       .eq('id', leadId)
       .select();
 
     if (error) throw new Error(error.message);
 
     // Otomatis catat di Timeline jika status benar-benar berubah
-    if (oldStatus !== newStatus) {
+    if (oldStatus !== dbStatus) {
       await addLeadActivity(
         leadId, 
         'Status Change', 

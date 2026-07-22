@@ -10,12 +10,19 @@ export default async function DashboardHome() {
   const supabase = await createClient()
   
   // Fetch real data from Supabase
-  const { data: leads } = await supabase
+  const { data: rawLeads } = await supabase
     .from('leads')
     .select('*')
-    .order('created_at', { ascending: false })
+    .order('created_at', { ascending: false });
   
-  const allLeads = leads || [];
+  const allLeads = (rawLeads || []).map((l: any) => ({
+    ...l,
+    name: l.name || l.full_name || 'Pengunjung Web (CTA WA)',
+    phone: l.phone || '-',
+    interest_cluster: l.interest_cluster || l.project || 'Brassia Garden',
+    budget: l.budget || l.budget_range || null,
+    status: l.status === 'baru' ? 'New' : l.status === 'follow_up' ? 'Contacted' : l.status === 'closing' ? 'Closing' : (l.status || 'New'),
+  }));
   
   // Hitung metrik
   const totalLeads = allLeads.length;
@@ -25,7 +32,7 @@ export default async function DashboardHome() {
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
   const closingThisMonth = allLeads.filter(l => {
-    if (l.status !== 'Closing') return false;
+    if (l.status !== 'Closing' && l.status !== 'closing') return false;
     const date = new Date(l.created_at);
     return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
   }).length;

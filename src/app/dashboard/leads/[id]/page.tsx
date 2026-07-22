@@ -21,6 +21,15 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
     return notFound();
   }
 
+  const normalizedLead = {
+    ...lead,
+    name: lead.name || lead.full_name || 'Pengunjung Web (CTA WA)',
+    phone: lead.phone || '-',
+    interest_cluster: lead.interest_cluster || (lead.project === 'weston_gateway' ? 'Weston Gateway' : lead.project === 'brassia_garden' ? 'Brassia Garden' : lead.project) || 'Brassia Garden',
+    budget: lead.budget || lead.budget_range || null,
+    status: lead.status === 'baru' ? 'New' : lead.status === 'follow_up' ? 'Contacted' : lead.status === 'closing' ? 'Closing' : (lead.status || 'New'),
+  };
+
   // Tarik data relasi (Rekam jejak, Catatan, Pengingat) menggunakan Server Actions yang sudah dibuat
   const { data: activities } = await getLeadActivities(id);
   const { data: notes } = await getLeadNotes(id);
@@ -28,10 +37,10 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
 
   return (
     <LeadDetailClient 
-      lead={lead} 
-      activities={activities} 
-      notes={notes} 
-      reminders={reminders} 
+      lead={normalizedLead} 
+      activities={activities || []} 
+      notes={notes || []} 
+      reminders={reminders || []} 
     />
   );
 }

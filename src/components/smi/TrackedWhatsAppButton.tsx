@@ -37,7 +37,7 @@ export function TrackedWhatsAppButton({
       const result = await saveLeadAction(trackingData, { interest_cluster: clusterName });
       
       if (result && !result.success) {
-        alert("DEBUG INFO - Gagal simpan ke DB: " + JSON.stringify(result.error));
+        console.error("Gagal simpan ke DB:", result.error);
       }
 
     } catch (error) {

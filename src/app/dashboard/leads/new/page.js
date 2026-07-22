@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { ArrowLeft, Save } from 'lucide-react'
 
+import { saveLeadAction } from '@/app/actions/lead.actions'
+
 export default function NewLeadPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -24,15 +26,26 @@ export default function NewLeadPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
     
-    // Nanti disini insert ke database Supabase
-    setTimeout(() => {
-      setIsSubmitting(false)
+    try {
+      await saveLeadAction(
+        { utm_source: formData.source },
+        { 
+          name: formData.fullName, 
+          phone: formData.phone, 
+          interest_cluster: formData.project, 
+          budget: formData.budgetRange 
+        }
+      )
       router.push('/dashboard/leads')
-    }, 1000)
+    } catch (err) {
+      console.error("Error creating manual lead:", err)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
