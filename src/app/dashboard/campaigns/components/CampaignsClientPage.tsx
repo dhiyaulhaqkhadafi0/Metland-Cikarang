@@ -15,14 +15,14 @@ export default function CampaignsClientPage({ campaigns }: { campaigns: any[] })
         <p className="text-slate-400 mt-1">Buat, salin, dan pantau tautan pelacakan untuk mengukur efektivitas kampanye iklan Anda.</p>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+      <div className="flex flex-col gap-10">
         {/* Area Formulir */}
-        <div className="xl:col-span-1">
+        <div className="w-full">
           <CampaignGenerator onGenerated={() => router.refresh()} />
         </div>
         
         {/* Area Tabel Metrik */}
-        <div className="xl:col-span-2 space-y-4">
+        <div className="w-full space-y-4">
           <h2 className="text-xl font-bold text-white">Performa Tautan Aktif</h2>
           <CampaignTable campaigns={campaigns} />
         </div>
