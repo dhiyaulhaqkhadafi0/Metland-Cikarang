@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  ArrowLeft, Zap, Paintbrush, LayoutTemplate, 
+  ArrowLeft, ArrowRight, Zap, Paintbrush, LayoutTemplate, 
   Settings, CheckCircle2, ChevronRight, Check,
   Wand2, LayoutGrid, Smartphone, Globe, Share2,
   Plus, Trash2, ArrowUp, ArrowDown, ExternalLink,
