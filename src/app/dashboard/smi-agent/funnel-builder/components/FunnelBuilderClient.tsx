@@ -12,7 +12,7 @@ import {
   Video, List, MessageSquare, HelpCircle, GalleryHorizontal, 
   MousePointerClick, Code, PlaySquare, Navigation, Minus, FileCode2,
   Bold, Italic, Underline, Strikethrough, Link as LinkIcon, ListOrdered, 
-  AlignLeft, AlignCenter, AlignRight, Smile, Heading, Palette, Type as FontIcon, Baseline, RemoveFormatting, X
+  AlignLeft, AlignCenter, AlignRight, AlignJustify, Smile, Heading, Palette, Type as FontIcon, Baseline, RemoveFormatting, X, Sparkles
 } from 'lucide-react';
 
 type Mode = 'aigen' | 'builder' | 'template';
@@ -33,6 +33,13 @@ interface TestimonialItem {
   avatar: string;
 }
 
+interface DevicePadding {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
 export default function FunnelBuilderClient() {
   const [activeMode, setActiveMode] = useState<Mode>('builder');
   const [builderTab, setBuilderTab] = useState<BuilderTab>('konten');
@@ -50,19 +57,41 @@ export default function FunnelBuilderClient() {
   const [heroBadge, setHeroBadge] = useState("METLAND CIKARANG");
   const [heroTitle, setHeroTitle] = useState("Rumah Elite Budget Ngirit");
   const [heroTitleGradient, setHeroTitleGradient] = useState("Myzora Metland Cikarang");
-  const [heroSubtitle, setHeroSubtitle] = useState("Uang habis buat bayar kontrakan tapi ga ada bekasnya? RUGI DONG 😆. Beralih ke Myzora, hunian mewah cicilan 5 jutaan.");
+  const [heroSubtitle, setHeroSubtitle] = useState("Uang habis buat bayar kontrakan tapi ga ada bekasnya? RUGI DONG 😆. Nih mending cobain Myzora, Rumah bagus, cicilan 3 jutaan doank masa?");
   
   // Target Text Selection ('headline' | 'gradient' | 'subtitle' | 'badge')
-  const [textTarget, setTextTarget] = useState<'headline' | 'gradient' | 'subtitle' | 'badge'>('headline');
+  const [textTarget, setTextTarget] = useState<'headline' | 'gradient' | 'subtitle' | 'badge'>('subtitle');
 
-  // Text Styling States
-  const [isBold, setIsBold] = useState(true);
+  // Rich Text Formatting & Typography States
+  const [isDarkEditorBg, setIsDarkEditorBg] = useState(true);
+  const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
-  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
-  const [fontSize, setFontSize] = useState("text-4xl md:text-7xl");
-  const [fontFamily, setFontFamily] = useState("font-sans");
-  const [textColor, setTextColor] = useState("#0f172a");
+  const [isStrikethrough, setIsStrikethrough] = useState(false);
+  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right' | 'justify'>('center');
+  const [headingType, setHeadingType] = useState<string>('Paragraph');
+  const [fontSizePx, setFontSizePx] = useState<string>('18px');
+  const [fontFamily, setFontFamily] = useState<string>('Inter');
+  const [lineHeight, setLineHeight] = useState<string>('1.5');
+  const [textColor, setTextColor] = useState<string>('#475569');
+  const [textBgHighlight, setTextBgHighlight] = useState<string>('transparent');
+
+  // Interactive Modals/Popovers inside Rich Text Editor
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const [textLinkUrl, setTextLinkUrl] = useState('');
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+  const [isNumberedList, setIsNumberedList] = useState(false);
+  const [isBulletList, setIsBulletList] = useState(false);
+
+  // Advance Desain Background & Responsive Padding States
+  const [bgColor, setBgColor] = useState('#ffffff');
+  const [bgMode, setBgMode] = useState<'warna' | 'gambar'>('warna');
+  const [paddingDevice, setPaddingDevice] = useState<Device>('desktop');
+  const [paddingConfig, setPaddingConfig] = useState<Record<Device, DevicePadding>>({
+    desktop: { top: 0, right: 0, bottom: 0, left: 0 },
+    tablet: { top: 0, right: 0, bottom: 0, left: 0 },
+    mobile: { top: 0, right: 0, bottom: 0, left: 0 },
+  });
 
   // Image Component States (Advance Feature support: zoom, replace, delete, fit)
   const [heroImage, setHeroImage] = useState("https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80");
@@ -84,7 +113,7 @@ export default function FunnelBuilderClient() {
 
   // FAQ Component States
   const [faqs, setFaqs] = useState<FAQItem[]>([
-    { id: 1, q: "Berapa cicilan per bulan di Myzora?", a: "Cicilan mulai dari 5 jutaan per bulan dengan promo bunga DP 0%." },
+    { id: 1, q: "Berapa cicilan per bulan di Myzora?", a: "Cicilan mulai dari 3 jutaan per bulan dengan promo bunga DP 0%." },
     { id: 2, q: "Berapa jarak ke stasiun KRL terdekat?", a: "Hanya 5 menit ke Stasiun KRL Cikarang dengan akses shuttle bus gratis." }
   ]);
 
@@ -96,7 +125,6 @@ export default function FunnelBuilderClient() {
 
   // Advance Panel Tab State
   const [isAdvanceOpen, setIsAdvanceOpen] = useState(true);
-  const [advanceTab, setAdvanceTab] = useState<'warna' | 'gambar' | 'efek'>('warna');
 
   // Publish Modal State
   const [showPublishModal, setShowPublishModal] = useState(false);
@@ -119,6 +147,15 @@ export default function FunnelBuilderClient() {
     }, 1000);
   };
 
+  // Helper to append emoji into target text
+  const addEmoji = (emoji: string) => {
+    if (textTarget === 'headline') setHeroTitle(prev => prev + ' ' + emoji);
+    else if (textTarget === 'gradient') setHeroTitleGradient(prev => prev + ' ' + emoji);
+    else if (textTarget === 'subtitle') setHeroSubtitle(prev => prev + ' ' + emoji);
+    else setHeroBadge(prev => prev + ' ' + emoji);
+    setIsEmojiPickerOpen(false);
+  };
+
   const componentsList = [
     { id: 'Teks', icon: Type, elementId: 'hero-headline' },
     { id: 'Gambar', icon: ImageIcon, elementId: 'hero-image' },
@@ -138,13 +175,40 @@ export default function FunnelBuilderClient() {
     if (builderTab !== 'konten') setBuilderTab('konten');
   };
 
-  // Image Presets
-  const imagePresets = [
-    { name: 'Exterior Modern', url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80' },
-    { name: 'Luxury Villa', url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80' },
-    { name: 'Interior Minimalis', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80' },
-    { name: 'Clubhouse & Pool', url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80' },
+  // Font list choices
+  const fontFamilies = [
+    { label: 'Page Font (Default)', value: 'Inter' },
+    { label: 'Inter (Sans)', value: 'Inter' },
+    { label: 'Plus Jakarta Sans', value: 'Plus Jakarta Sans' },
+    { label: 'Poppins', value: 'Poppins' },
+    { label: 'Montserrat', value: 'Montserrat' },
+    { label: 'Outfit', value: 'Outfit' },
+    { label: 'Roboto', value: 'Roboto' },
+    { label: 'Playfair Display (Serif)', value: 'Playfair Display' },
+    { label: 'Oswald (Display)', value: 'Oswald' },
+    { label: 'Merriweather (Serif)', value: 'Merriweather' },
+    { label: 'Courier Prime (Mono)', value: 'Courier New' },
   ];
+
+  const popularEmojis = ['🔥', '🚀', '😆', '🏠', '💰', '✨', '⚡', '📌', '🔑', '💯', '🎁', '💎', '👍', '🌟', '📍', '📞', '⏳', '✅', '🏆', '🏷️'];
+
+  // Current active text target value
+  const getActiveTextValue = () => {
+    if (textTarget === 'headline') return heroTitle;
+    if (textTarget === 'gradient') return heroTitleGradient;
+    if (textTarget === 'subtitle') return heroSubtitle;
+    return heroBadge;
+  };
+
+  const updateActiveTextValue = (val: string) => {
+    if (textTarget === 'headline') setHeroTitle(val);
+    else if (textTarget === 'gradient') setHeroTitleGradient(val);
+    else if (textTarget === 'subtitle') setHeroSubtitle(val);
+    else setHeroBadge(val);
+  };
+
+  // Current active padding values
+  const currentPadding = paddingConfig[device];
 
   return (
     <div className="min-h-screen bg-[#111111] text-slate-200 font-sans flex flex-col overflow-hidden h-screen">
@@ -185,7 +249,7 @@ export default function FunnelBuilderClient() {
             onClick={() => {
               setHeroTitle("Rumah Elite Budget Ngirit");
               setHeroTitleGradient("Myzora Metland Cikarang");
-              setHeroSubtitle("Uang habis buat bayar kontrakan tapi ga ada bekasnya? RUGI DONG 😆. Beralih ke Myzora, hunian mewah cicilan 5 jutaan.");
+              setHeroSubtitle("Uang habis buat bayar kontrakan tapi ga ada bekasnya? RUGI DONG 😆. Nih mending cobain Myzora, Rumah bagus, cicilan 3 jutaan doank masa?");
               setHeroImage("https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80");
               setHeroImageZoom(100);
             }}
@@ -213,7 +277,7 @@ export default function FunnelBuilderClient() {
         
         {/* --- LEFT SIDEBAR --- */}
         <aside 
-          className={`${isSidebarOpen ? 'w-[380px]' : 'w-0'} bg-[#161618] border-r border-white/5 flex flex-col transition-all duration-300 shrink-0 z-40 relative`}
+          className={`${isSidebarOpen ? 'w-[420px]' : 'w-0'} bg-[#161618] border-r border-white/5 flex flex-col transition-all duration-300 shrink-0 z-40 relative`}
         >
           {isSidebarOpen && (
             <>
@@ -241,7 +305,7 @@ export default function FunnelBuilderClient() {
                 </div>
               </div>
 
-              {/* Sidebar Content Based on Mode (With prominent custom-scrollbar) */}
+              {/* Sidebar Content Based on Mode */}
               <div className="flex-1 overflow-y-auto custom-scrollbar">
                 
                 {/* MODE: AI GENERATE */}
@@ -359,7 +423,7 @@ export default function FunnelBuilderClient() {
                             <div className="p-5 space-y-6 overflow-y-auto custom-scrollbar">
                               
                               {/* ---------------------------------------------------- */}
-                              {/* 1. TEKS COMPONENT EDITOR */}
+                              {/* 1. TEKS COMPONENT EDITOR (COMPREHENSIVE EXPANDED TOOLBAR) */}
                               {/* ---------------------------------------------------- */}
                               {activeComponent === 'Teks' && (
                                 <>
@@ -393,90 +457,367 @@ export default function FunnelBuilderClient() {
                                     </div>
                                   </div>
 
-                                  <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-400">Isi Konten Teks Live</label>
+                                  <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                      <label className="text-xs font-bold text-slate-400">Isi Konten Teks Live</label>
+                                      
+                                      {/* Background Editor Gelap Toggle (Match scalev reference) */}
+                                      <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsDarkEditorBg(!isDarkEditorBg)}>
+                                        <div className={`w-8 h-4 rounded-full transition-colors relative p-0.5 ${isDarkEditorBg ? 'bg-amber-500' : 'bg-slate-600'}`}>
+                                          <div className={`w-3 h-3 bg-white rounded-full transition-transform ${isDarkEditorBg ? 'translate-x-4' : 'translate-x-0'}`}></div>
+                                        </div>
+                                        <span className="text-[11px] font-medium text-slate-300">Background Editor Gelap</span>
+                                      </div>
+                                    </div>
                                     
-                                    {/* Rich Text Toolbar */}
-                                    <div className="border border-white/10 rounded-xl overflow-hidden bg-[#161618]">
-                                      <div className="bg-[#1a1a1c] border-b border-white/10 p-2 flex flex-wrap gap-1">
-                                        {/* Basic Formatting */}
-                                        <button onClick={() => setIsBold(!isBold)} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isBold ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`} title="Bold"><Bold size={16} /></button>
-                                        <button onClick={() => setIsItalic(!isItalic)} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isItalic ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`} title="Italic"><Italic size={16} /></button>
-                                        <button onClick={() => setIsUnderline(!isUnderline)} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isUnderline ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`} title="Underline"><Underline size={16} /></button>
+                                    {/* Scalev-like 3-Row Comprehensive Toolbar */}
+                                    <div className="border border-white/15 rounded-xl overflow-hidden bg-[#161618] shadow-lg">
+                                      
+                                      {/* ROW 1: Basic Inline Formatting Controls */}
+                                      <div className="bg-[#1a1a1c] border-b border-white/10 p-2 flex flex-wrap items-center gap-1.5 relative">
+                                        <button onClick={() => setIsBold(!isBold)} className={`w-8 h-8 flex items-center justify-center rounded font-bold transition-colors ${isBold ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Bold (B)"><Bold size={16} /></button>
+                                        <button onClick={() => setIsItalic(!isItalic)} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isItalic ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Italic (I)"><Italic size={16} /></button>
                                         
-                                        <div className="w-px h-6 bg-white/10 mx-1 my-auto"></div>
+                                        {/* Text Color Picker Swatch */}
+                                        <div className="relative group flex items-center">
+                                          <label className="w-8 h-8 flex flex-col items-center justify-center rounded hover:bg-white/10 cursor-pointer text-slate-300" title="Warna Teks">
+                                            <Baseline size={16} />
+                                            <span className="w-4 h-1 rounded-full mt-0.5" style={{ backgroundColor: textColor }}></span>
+                                            <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="opacity-0 w-0 h-0 absolute" />
+                                          </label>
+                                        </div>
+
+                                        {/* Highlight Background Color Swatch */}
+                                        <div className="relative group flex items-center">
+                                          <label className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 cursor-pointer text-slate-300" title="Warna Sorotan Latar Teks">
+                                            <Palette size={16} />
+                                            <input type="color" value={textBgHighlight === 'transparent' ? '#ffffff' : textBgHighlight} onChange={(e) => setTextBgHighlight(e.target.value)} className="opacity-0 w-0 h-0 absolute" />
+                                          </label>
+                                        </div>
+
+                                        <button onClick={() => setIsUnderline(!isUnderline)} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isUnderline ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Underline (U)"><Underline size={16} /></button>
                                         
-                                        {/* Alignment */}
+                                        {/* Huruf Dicoret / Strikethrough */}
+                                        <button onClick={() => setIsStrikethrough(!isStrikethrough)} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isStrikethrough ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Huruf Dicoret (Strikethrough)"><Strikethrough size={16} /></button>
+
+                                        <div className="w-px h-6 bg-white/10 mx-0.5"></div>
+
+                                        {/* Link Tautan Modal Toggle */}
+                                        <button onClick={() => setIsLinkModalOpen(!isLinkModalOpen)} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isLinkModalOpen || textLinkUrl ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`} title="Tautan Link"><LinkIcon size={16} /></button>
+
+                                        {/* Ordered List (123) */}
+                                        <button onClick={() => { setIsNumberedList(!isNumberedList); setIsBulletList(false); }} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isNumberedList ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`} title="List Nomor (123)"><ListOrdered size={16} /></button>
+
+                                        {/* Unordered Bullet List */}
+                                        <button onClick={() => { setIsBulletList(!isBulletList); setIsNumberedList(false); }} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isBulletList ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`} title="List Peluru / Bullet"><List size={16} /></button>
+
+                                        {/* Alignment Options */}
                                         <button onClick={() => setTextAlign('left')} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${textAlign === 'left' ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`}><AlignLeft size={16} /></button>
                                         <button onClick={() => setTextAlign('center')} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${textAlign === 'center' ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`}><AlignCenter size={16} /></button>
                                         <button onClick={() => setTextAlign('right')} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${textAlign === 'right' ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`}><AlignRight size={16} /></button>
+                                      </div>
 
-                                        <div className="w-px h-6 bg-white/10 mx-1 my-auto"></div>
-
-                                        {/* Font controls */}
+                                      {/* ROW 2: Headings & Font Sizes (Scalev Image 2) */}
+                                      <div className="bg-[#1a1a1c] border-b border-white/10 p-2 flex items-center gap-2">
+                                        {/* Heading Selector */}
                                         <select 
-                                          value={fontFamily} 
-                                          onChange={(e) => setFontFamily(e.target.value)}
-                                          className="bg-[#0a0a0a] text-xs text-slate-200 border border-white/10 rounded px-2 h-8 focus:outline-none"
+                                          value={headingType} 
+                                          onChange={(e) => setHeadingType(e.target.value)}
+                                          className="bg-[#0a0a0a] text-xs text-white border border-white/15 rounded-lg px-2.5 h-8 focus:outline-none focus:border-amber-500 flex-1 font-semibold"
                                         >
-                                          <option value="font-sans">Inter / Sans</option>
-                                          <option value="font-serif">Playfair / Serif</option>
-                                          <option value="font-mono">JetBrains / Mono</option>
+                                          <option value="Heading 1">Heading 1 (H1)</option>
+                                          <option value="Heading 2">Heading 2 (H2)</option>
+                                          <option value="Heading 3">Heading 3 (H3)</option>
+                                          <option value="Sub Heading">Sub Heading</option>
+                                          <option value="Paragraph">Paragraph</option>
+                                        </select>
+
+                                        {/* Font Size Selector */}
+                                        <select 
+                                          value={fontSizePx} 
+                                          onChange={(e) => setFontSizePx(e.target.value)}
+                                          className="bg-[#0a0a0a] text-xs text-amber-400 border border-white/15 rounded-lg px-2.5 h-8 focus:outline-none focus:border-amber-500 font-mono font-bold"
+                                        >
+                                          <option value="12px">12px</option>
+                                          <option value="14px">14px</option>
+                                          <option value="16px">16px</option>
+                                          <option value="18px">18px</option>
+                                          <option value="20px">20px</option>
+                                          <option value="24px">24px</option>
+                                          <option value="32px">32px</option>
+                                          <option value="40px">40px</option>
+                                          <option value="48px">48px</option>
+                                          <option value="64px">64px</option>
                                         </select>
                                       </div>
 
-                                      {/* Textarea bound to selected text target */}
+                                      {/* ROW 3: Page Font, Line Height, Image, Emoji, Formatting */}
+                                      <div className="bg-[#1a1a1c] border-b border-white/10 p-2 flex items-center gap-2 relative">
+                                        {/* Page Font Dropdown (Many choices) */}
+                                        <select 
+                                          value={fontFamily} 
+                                          onChange={(e) => setFontFamily(e.target.value)}
+                                          className="bg-[#0a0a0a] text-xs text-slate-200 border border-white/15 rounded-lg px-2.5 h-8 focus:outline-none focus:border-amber-500 flex-1 font-medium"
+                                        >
+                                          {fontFamilies.map(f => (
+                                            <option key={f.label} value={f.value}>{f.label}</option>
+                                          ))}
+                                        </select>
+
+                                        {/* Line Height Selector */}
+                                        <select 
+                                          value={lineHeight} 
+                                          onChange={(e) => setLineHeight(e.target.value)}
+                                          className="bg-[#0a0a0a] text-xs text-slate-300 border border-white/15 rounded-lg px-2 h-8 focus:outline-none font-mono"
+                                          title="Line Height (Jarak Baris)"
+                                        >
+                                          <option value="1.0">1.0</option>
+                                          <option value="1.2">1.2</option>
+                                          <option value="1.5">1.5</option>
+                                          <option value="1.8">1.8</option>
+                                          <option value="2.0">2.0</option>
+                                        </select>
+
+                                        {/* Emoji Picker Button */}
+                                        <button 
+                                          onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)}
+                                          className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isEmojiPickerOpen ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`}
+                                          title="Pilih Emoji"
+                                        >
+                                          <Smile size={16} />
+                                        </button>
+
+                                        {/* Clear formatting */}
+                                        <button 
+                                          onClick={() => {
+                                            setIsBold(false);
+                                            setIsItalic(false);
+                                            setIsUnderline(false);
+                                            setIsStrikethrough(false);
+                                            setTextBgHighlight('transparent');
+                                            setTextColor('#475569');
+                                            setTextLinkUrl('');
+                                          }}
+                                          className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded text-slate-400 hover:text-rose-400" 
+                                          title="Hapus Formatting"
+                                        >
+                                          <RemoveFormatting size={16} />
+                                        </button>
+
+                                        {/* Interactive Emoji Picker Popover */}
+                                        {isEmojiPickerOpen && (
+                                          <div className="absolute top-12 right-2 bg-[#161618] border border-amber-500/40 rounded-xl p-3 shadow-2xl z-50 w-64 animate-in fade-in">
+                                            <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2">
+                                              <span className="text-xs font-bold text-amber-400 flex items-center gap-1">
+                                                <Smile size={14} /> Sisipkan Emoji
+                                              </span>
+                                              <button onClick={() => setIsEmojiPickerOpen(false)} className="text-slate-400 hover:text-white">
+                                                <X size={14} />
+                                              </button>
+                                            </div>
+                                            <div className="grid grid-cols-5 gap-1.5 max-h-36 overflow-y-auto custom-scrollbar">
+                                              {popularEmojis.map((emoji, idx) => (
+                                                <button 
+                                                  key={idx}
+                                                  onClick={() => addEmoji(emoji)}
+                                                  className="h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded transition-transform hover:scale-125"
+                                                >
+                                                  {emoji}
+                                                </button>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+
+                                      {/* Link URL Modal inside Editor */}
+                                      {isLinkModalOpen && (
+                                        <div className="p-3 bg-[#0a0a0a] border-b border-white/10 flex items-center gap-2 animate-in fade-in">
+                                          <LinkIcon size={14} className="text-amber-400 shrink-0" />
+                                          <input 
+                                            type="text" 
+                                            value={textLinkUrl} 
+                                            onChange={(e) => setTextLinkUrl(e.target.value)}
+                                            placeholder="Masukkan URL tautan (https://...)" 
+                                            className="flex-1 bg-[#161618] border border-white/10 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                                          />
+                                          <button 
+                                            onClick={() => setIsLinkModalOpen(false)} 
+                                            className="px-3 py-1.5 bg-amber-500 text-black text-xs font-bold rounded-lg hover:bg-amber-400"
+                                          >
+                                            Simpan Tautan
+                                          </button>
+                                        </div>
+                                      )}
+
+                                      {/* Dynamic Textarea Editor (Dark/Light mode compliant) */}
                                       <textarea 
-                                        className="w-full bg-[#0a0a0a] p-4 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50 resize-y min-h-[140px] font-sans custom-scrollbar"
-                                        value={
-                                          textTarget === 'headline' ? heroTitle :
-                                          textTarget === 'gradient' ? heroTitleGradient :
-                                          textTarget === 'subtitle' ? heroSubtitle : heroBadge
-                                        }
-                                        onChange={(e) => {
-                                          const val = e.target.value;
-                                          if (textTarget === 'headline') setHeroTitle(val);
-                                          else if (textTarget === 'gradient') setHeroTitleGradient(val);
-                                          else if (textTarget === 'subtitle') setHeroSubtitle(val);
-                                          else setHeroBadge(val);
-                                        }}
+                                        className={`w-full p-4 text-sm focus:outline-none resize-y min-h-[150px] transition-colors custom-scrollbar ${
+                                          isDarkEditorBg ? 'bg-[#0a0a0a] text-white' : 'bg-white text-slate-900 font-semibold'
+                                        }`}
+                                        style={{ fontFamily: fontFamily }}
+                                        value={getActiveTextValue()}
+                                        onChange={(e) => updateActiveTextValue(e.target.value)}
                                       ></textarea>
                                     </div>
                                   </div>
 
-                                  {/* Advance Text Dropdown */}
+                                  {/* Advance Dropdown (Exact Match to Scalev Reference Image 3) */}
                                   <div className="border border-white/10 rounded-xl overflow-hidden">
                                     <button 
                                       onClick={() => setIsAdvanceOpen(!isAdvanceOpen)}
                                       className="w-full bg-[#1a1a1c] p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
                                     >
-                                      <span className="text-sm font-bold text-white">Advance Formatting</span>
+                                      <span className="text-sm font-bold text-white flex items-center gap-2">
+                                        <Sparkles size={16} className="text-amber-400" /> Advance
+                                      </span>
                                       <ChevronDown size={18} className={`text-slate-400 transition-transform ${isAdvanceOpen ? 'rotate-180' : ''}`} />
                                     </button>
                                     
                                     {isAdvanceOpen && (
-                                      <div className="p-5 bg-[#0a0a0a] border-t border-white/10 space-y-5">
+                                      <div className="p-5 bg-[#0a0a0a] border-t border-white/10 space-y-6">
+                                        
+                                        {/* Desain: Latar (Background) */}
                                         <div className="space-y-3">
-                                          <label className="text-xs font-bold text-slate-300 block">Warna Teks & Latar</label>
-                                          <div className="flex gap-2 mb-3">
-                                            {['#0f172a', '#e11d48', '#d97706', '#059669', '#2563eb', '#7c3aed'].map((color) => (
-                                              <div 
-                                                key={color}
-                                                onClick={() => setTextColor(color)}
-                                                className={`w-8 h-8 rounded-full cursor-pointer border-2 transition-transform hover:scale-110 ${textColor === color ? 'border-amber-400 scale-110 shadow-lg' : 'border-white/20'}`}
-                                                style={{ backgroundColor: color }}
-                                              ></div>
+                                          <h4 className="text-xs font-bold text-slate-300">Desain</h4>
+                                          <p className="text-[11px] text-slate-500">Latar (Background)</p>
+                                          
+                                          <div className="flex gap-2">
+                                            <button 
+                                              onClick={() => setBgColor('#ffffff')}
+                                              className="w-10 h-10 border border-white/20 rounded-xl flex items-center justify-center hover:bg-white/5 text-slate-400 hover:text-white"
+                                              title="Clear Background"
+                                            >
+                                              <X size={18} />
+                                            </button>
+                                            <button 
+                                              onClick={() => setBgMode('warna')}
+                                              className={`flex-1 h-10 rounded-xl border font-bold text-xs transition-colors ${bgMode === 'warna' ? 'bg-amber-500/20 text-amber-400 border-amber-500' : 'border-white/10 text-slate-300 hover:bg-white/5'}`}
+                                            >
+                                              Warna
+                                            </button>
+                                            <button 
+                                              onClick={() => setBgMode('gambar')}
+                                              className={`flex-1 h-10 rounded-xl border font-bold text-xs transition-colors ${bgMode === 'gambar' ? 'bg-amber-500/20 text-amber-400 border-amber-500' : 'border-white/10 text-slate-300 hover:bg-white/5'}`}
+                                            >
+                                              Gambar
+                                            </button>
+                                          </div>
+                                          
+                                          {/* Swatches (Scalev Image 3 match) */}
+                                          {bgMode === 'warna' && (
+                                            <div className="flex items-center gap-2.5 pt-2">
+                                              {[
+                                                { label: 'White', color: '#ffffff' },
+                                                { label: 'Dark', color: '#1c1c1e' },
+                                                { label: 'Ice Blue', color: '#f0f9ff' },
+                                                { label: 'Mint', color: '#ecfdf5' },
+                                                { label: 'Cream', color: '#fffbeb' },
+                                                { label: 'Pink', color: '#fff1f2' },
+                                              ].map((swatch, idx) => (
+                                                <div 
+                                                  key={idx}
+                                                  onClick={() => setBgColor(swatch.color)}
+                                                  className={`w-8 h-8 rounded-full border-2 cursor-pointer transition-transform hover:scale-110 ${bgColor === swatch.color ? 'border-amber-400 scale-110 shadow-lg' : 'border-white/20'}`}
+                                                  style={{ backgroundColor: swatch.color }}
+                                                  title={swatch.label}
+                                                ></div>
+                                              ))}
+
+                                              {/* Rainbow Custom Color Input */}
+                                              <label className="w-8 h-8 rounded-full bg-gradient-to-tr from-rose-500 via-amber-400 to-indigo-500 border-2 border-white/40 cursor-pointer flex items-center justify-center shadow-md hover:scale-110 transition-transform">
+                                                <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="opacity-0 w-0 h-0" />
+                                              </label>
+                                            </div>
+                                          )}
+                                        </div>
+
+                                        <div className="w-full h-px bg-white/10"></div>
+
+                                        {/* Padding Responsive Controls (Scalev Image 3 match) */}
+                                        <div className="space-y-4">
+                                          <label className="text-xs font-bold text-slate-300 block">Padding</label>
+                                          
+                                          {/* Device selector tabs */}
+                                          <div className="grid grid-cols-3 gap-2">
+                                            {(['desktop', 'tablet', 'mobile'] as const).map(d => (
+                                              <button 
+                                                key={d}
+                                                onClick={() => setPaddingDevice(d)}
+                                                className={`py-2.5 rounded-xl text-xs font-bold capitalize border transition-all ${paddingDevice === d ? 'bg-amber-500/20 text-amber-400 border-amber-500 shadow-sm' : 'border-white/10 text-slate-400 hover:text-white bg-[#161618]'}`}
+                                              >
+                                                {d}
+                                              </button>
                                             ))}
                                           </div>
-                                          <div className="relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-xs">Hex:</span>
-                                            <input 
-                                              type="text" 
-                                              value={textColor} 
-                                              onChange={(e) => setTextColor(e.target.value)}
-                                              className="w-full bg-[#161618] border border-white/10 rounded-lg py-2 pl-12 pr-3 text-sm font-mono text-white focus:outline-none focus:border-amber-500" 
-                                            />
+
+                                          {/* 4 Padding Input Fields (Atas, Kanan, Bawah, Kiri) */}
+                                          <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                              <label className="text-[11px] text-slate-400 block mb-1">Padding Atas</label>
+                                              <div className="flex bg-[#161618] border border-white/10 rounded-xl overflow-hidden focus-within:border-amber-500">
+                                                <input 
+                                                  type="number" 
+                                                  value={paddingConfig[paddingDevice].top}
+                                                  onChange={(e) => setPaddingConfig({
+                                                    ...paddingConfig,
+                                                    [paddingDevice]: { ...paddingConfig[paddingDevice], top: Number(e.target.value) }
+                                                  })}
+                                                  className="w-full bg-transparent p-2.5 text-xs text-white focus:outline-none font-mono"
+                                                />
+                                                <span className="bg-white/5 text-slate-400 text-xs px-3 flex items-center font-mono">px</span>
+                                              </div>
+                                            </div>
+
+                                            <div>
+                                              <label className="text-[11px] text-slate-400 block mb-1">Padding Kanan</label>
+                                              <div className="flex bg-[#161618] border border-white/10 rounded-xl overflow-hidden focus-within:border-amber-500">
+                                                <input 
+                                                  type="number" 
+                                                  value={paddingConfig[paddingDevice].right}
+                                                  onChange={(e) => setPaddingConfig({
+                                                    ...paddingConfig,
+                                                    [paddingDevice]: { ...paddingConfig[paddingDevice], right: Number(e.target.value) }
+                                                  })}
+                                                  className="w-full bg-transparent p-2.5 text-xs text-white focus:outline-none font-mono"
+                                                />
+                                                <span className="bg-white/5 text-slate-400 text-xs px-3 flex items-center font-mono">px</span>
+                                              </div>
+                                            </div>
+
+                                            <div>
+                                              <label className="text-[11px] text-slate-400 block mb-1">Padding Bawah</label>
+                                              <div className="flex bg-[#161618] border border-white/10 rounded-xl overflow-hidden focus-within:border-amber-500">
+                                                <input 
+                                                  type="number" 
+                                                  value={paddingConfig[paddingDevice].bottom}
+                                                  onChange={(e) => setPaddingConfig({
+                                                    ...paddingConfig,
+                                                    [paddingDevice]: { ...paddingConfig[paddingDevice], bottom: Number(e.target.value) }
+                                                  })}
+                                                  className="w-full bg-transparent p-2.5 text-xs text-white focus:outline-none font-mono"
+                                                />
+                                                <span className="bg-white/5 text-slate-400 text-xs px-3 flex items-center font-mono">px</span>
+                                              </div>
+                                            </div>
+
+                                            <div>
+                                              <label className="text-[11px] text-slate-400 block mb-1">Padding Kiri</label>
+                                              <div className="flex bg-[#161618] border border-white/10 rounded-xl overflow-hidden focus-within:border-amber-500">
+                                                <input 
+                                                  type="number" 
+                                                  value={paddingConfig[paddingDevice].left}
+                                                  onChange={(e) => setPaddingConfig({
+                                                    ...paddingConfig,
+                                                    [paddingDevice]: { ...paddingConfig[paddingDevice], left: Number(e.target.value) }
+                                                  })}
+                                                  className="w-full bg-transparent p-2.5 text-xs text-white focus:outline-none font-mono"
+                                                />
+                                                <span className="bg-white/5 text-slate-400 text-xs px-3 flex items-center font-mono">px</span>
+                                              </div>
+                                            </div>
                                           </div>
+
                                         </div>
                                       </div>
                                     )}
@@ -563,25 +904,6 @@ export default function FunnelBuilderClient() {
                                         placeholder="https://images.unsplash.com/..."
                                         className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
                                       />
-                                    </div>
-
-                                    {/* Preset Gallery Picker */}
-                                    <div className="space-y-2">
-                                      <label className="text-xs text-slate-400 block">Pilih Gambar Presets</label>
-                                      <div className="grid grid-cols-2 gap-2">
-                                        {imagePresets.map((preset, idx) => (
-                                          <div 
-                                            key={idx}
-                                            onClick={() => { setHeroImage(preset.url); setHeroImageZoom(100); }}
-                                            className="relative h-16 rounded-lg overflow-hidden border border-white/10 cursor-pointer hover:border-amber-500 group"
-                                          >
-                                            <img src={preset.url} alt={preset.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
-                                            <div className="absolute inset-0 bg-black/40 flex items-end p-1.5">
-                                              <span className="text-[10px] font-bold text-white truncate">{preset.name}</span>
-                                            </div>
-                                          </div>
-                                        ))}
-                                      </div>
                                     </div>
 
                                     {/* Aspect Ratio / Object Fit */}
@@ -817,15 +1139,6 @@ export default function FunnelBuilderClient() {
                                 </div>
                               )}
 
-                              {/* Generic Fallback Component Editor */}
-                              {['Daftar/List'].includes(activeComponent) && (
-                                <div className="py-8 flex flex-col items-center justify-center text-center opacity-70">
-                                  <Settings size={32} className="text-amber-400 mb-2" />
-                                  <h4 className="text-sm font-bold text-white mb-1">Pengaturan {activeComponent}</h4>
-                                  <p className="text-xs text-slate-400">Section aktif dan terhubung secara live ke canvas preview.</p>
-                                </div>
-                              )}
-
                             </div>
                           </div>
                         )}
@@ -905,9 +1218,9 @@ export default function FunnelBuilderClient() {
             {/* Device & Zoom Controls */}
             <div className="flex items-center gap-5 bg-slate-50 rounded-xl p-1.5 border border-slate-200 shadow-sm">
               <div className="flex items-center gap-1 border-r border-slate-200 pr-3">
-                <button onClick={() => setDevice('desktop')} className={`p-2 rounded-lg transition-colors ${device === 'desktop' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}><Monitor size={16} /></button>
-                <button onClick={() => setDevice('tablet')} className={`p-2 rounded-lg transition-colors ${device === 'tablet' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}><Tablet size={16} /></button>
-                <button onClick={() => setDevice('mobile')} className={`p-2 rounded-lg transition-colors ${device === 'mobile' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}><Smartphone size={16} /></button>
+                <button onClick={() => setDevice('desktop')} className={`p-2 rounded-lg transition-colors ${device === 'desktop' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`} title="Desktop View"><Monitor size={16} /></button>
+                <button onClick={() => setDevice('tablet')} className={`p-2 rounded-lg transition-colors ${device === 'tablet' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`} title="Tablet View"><Tablet size={16} /></button>
+                <button onClick={() => setDevice('mobile')} className={`p-2 rounded-lg transition-colors ${device === 'mobile' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`} title="Mobile View"><Smartphone size={16} /></button>
               </div>
               <div className="flex items-center gap-2 pl-1 pr-2">
                 <button onClick={handleZoomOut} className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-500 hover:text-slate-800 transition-colors"><ZoomOut size={16} /></button>
@@ -917,16 +1230,24 @@ export default function FunnelBuilderClient() {
             </div>
           </div>
 
-          {/* Canvas Area (Scrollable with explicit prominent custom-scrollbar) */}
+          {/* Canvas Area (Scrollable with explicit custom-scrollbar) */}
           <div className="flex-1 overflow-auto custom-scrollbar bg-slate-100 p-8 flex items-start justify-center relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
             
-            {/* The "Paper" / Mockup Container */}
+            {/* The "Paper" / Mockup Container (Responsive per device) */}
             <div 
-              className={`bg-white shadow-2xl transition-all duration-300 relative origin-top overflow-hidden border border-slate-200 ${
+              className={`shadow-2xl transition-all duration-300 relative origin-top overflow-hidden border border-slate-200 ${
                 device === 'desktop' ? 'w-full max-w-[1200px] rounded-xl' : 
                 device === 'tablet' ? 'w-[768px] rounded-[2rem]' : 'w-[375px] rounded-[3rem]'
               }`}
-              style={{ transform: `scale(${zoom / 100})`, minHeight: '1000px' }}
+              style={{ 
+                backgroundColor: bgColor,
+                transform: `scale(${zoom / 100})`, 
+                minHeight: '1000px',
+                paddingTop: `${currentPadding.top}px`,
+                paddingRight: `${currentPadding.right}px`,
+                paddingBottom: `${currentPadding.bottom}px`,
+                paddingLeft: `${currentPadding.left}px`,
+              }}
             >
               {/* Mockup Landing Page Content */}
               <div className="font-sans text-slate-800 relative w-full h-full pb-20">
@@ -948,7 +1269,6 @@ export default function FunnelBuilderClient() {
 
                 {/* Hero Section */}
                 <div className="relative pt-16 pb-24 px-6 text-center">
-                  <div className="absolute inset-0 bg-slate-50 z-0"></div>
                   <div className="relative z-10 max-w-4xl mx-auto space-y-6">
                     
                     {/* Badge Hero (Interactive Sync) */}
@@ -972,7 +1292,7 @@ export default function FunnelBuilderClient() {
                       )}
                     </div>
 
-                    {/* Headline Hero (Interactive Sync) */}
+                    {/* Headline Hero (Interactive Sync with live custom formatting) */}
                     <div 
                       onClick={() => { selectSection('Teks', 'hero-headline'); setTextTarget('headline'); }}
                       onMouseEnter={() => setHoveredElementId('hero-headline')}
@@ -983,8 +1303,16 @@ export default function FunnelBuilderClient() {
                       }`}
                     >
                       <h1 
-                        className={`${fontSize} ${fontFamily} font-black text-slate-900 leading-tight ${isBold ? 'font-bold' : ''} ${isItalic ? 'italic' : ''} ${isUnderline ? 'underline' : ''}`}
-                        style={{ textAlign, color: textColor }}
+                        className={`font-black text-slate-900 leading-tight ${isBold ? 'font-bold' : 'font-normal'} ${isItalic ? 'italic' : ''}`}
+                        style={{ 
+                          fontFamily: fontFamily,
+                          fontSize: headingType === 'Heading 1' ? '56px' : headingType === 'Heading 2' ? '40px' : headingType === 'Heading 3' ? '32px' : fontSizePx,
+                          lineHeight: lineHeight,
+                          textAlign: textAlign as any, 
+                          color: textColor,
+                          backgroundColor: textBgHighlight,
+                          textDecoration: isUnderline && isStrikethrough ? 'underline line-through' : isUnderline ? 'underline' : isStrikethrough ? 'line-through' : 'none'
+                        }}
                       >
                         {heroTitle}<br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-amber-500">
@@ -999,15 +1327,32 @@ export default function FunnelBuilderClient() {
                       )}
                     </div>
 
-                    {/* Subtitle Hero */}
-                    <p 
+                    {/* Subtitle Hero (Interactive Sync with formatting & optional link) */}
+                    <div 
                       onClick={() => { selectSection('Teks', 'hero-headline'); setTextTarget('subtitle'); }}
-                      className="text-base md:text-xl text-slate-500 mb-10 max-w-2xl mx-auto cursor-pointer hover:text-slate-900 transition-colors"
+                      className="cursor-pointer hover:opacity-80 transition-opacity max-w-2xl mx-auto"
                     >
-                      {heroSubtitle}
-                    </p>
+                      <p 
+                        className={`text-base md:text-xl text-slate-600 mb-10 ${isItalic ? 'italic' : ''}`}
+                        style={{ 
+                          fontFamily: fontFamily,
+                          lineHeight: lineHeight,
+                          textAlign: textAlign as any,
+                          textDecoration: isUnderline && isStrikethrough ? 'underline line-through' : isUnderline ? 'underline' : isStrikethrough ? 'line-through' : 'none'
+                        }}
+                      >
+                        {isNumberedList ? '1. ' : isBulletList ? '• ' : ''}
+                        {textLinkUrl ? (
+                          <a href={textLinkUrl} target="_blank" rel="noreferrer" className="text-blue-600 underline font-semibold">
+                            {heroSubtitle}
+                          </a>
+                        ) : (
+                          heroSubtitle
+                        )}
+                      </p>
+                    </div>
                     
-                    {/* Hero Image Container (Interactive Sync & Advanced Zoom Preview) */}
+                    {/* Hero Image Container */}
                     <div 
                       onClick={() => selectSection('Gambar', 'hero-image')}
                       onMouseEnter={() => setHoveredElementId('hero-image')}
