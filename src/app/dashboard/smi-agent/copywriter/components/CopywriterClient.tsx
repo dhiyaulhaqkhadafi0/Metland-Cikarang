@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { 
-  PenTool, Target, Layers, ChevronRight, 
+  PenTool, Target, Layers, ChevronRight, ArrowLeft, 
   Wand2, Zap, ArrowRight, Save, Copy, RefreshCw, FileText, Download, Check,
   Cpu, FileDown, ShieldCheck, Flame, BarChart3, Heart, Eye, Award, Printer
 } from 'lucide-react';
@@ -221,6 +221,12 @@ export default function CopywriterClient() {
       <header className="sticky top-0 z-50 bg-[#080C14]/90 backdrop-blur-2xl border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
+            <Link 
+              href="/dashboard/smi-agent" 
+              className="p-2.5 bg-white/5 hover:bg-white/10 rounded-xl transition-all text-slate-400 hover:text-emerald-400 mr-2"
+            >
+              <ArrowLeft size={18} />
+            </Link>
             <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 p-[1px] shadow-[0_0_20px_rgba(16,185,129,0.3)]">
               <div className="w-full h-full bg-[#080C14] rounded-[15px] flex items-center justify-center">
                 <PenTool size={22} className="text-emerald-400" />
