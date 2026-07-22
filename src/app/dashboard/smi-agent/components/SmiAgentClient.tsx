@@ -18,9 +18,9 @@ const aiFeatures = [
     shadow: 'shadow-[0_0_20px_rgba(16,185,129,0.3)]'
   },
   {
-    id: 'landing-page',
-    title: 'AI Landing Page Builder',
-    description: 'Buat landing page properti dengan struktur storytelling dan copywriting pemikat secara otomatis.',
+    id: 'funnel-builder',
+    title: 'AI Funnel Builder',
+    description: 'Bukan sekadar Landing Page. Rancang funnel otomatis dari Meta Ads hingga Closing dengan struktur konversi tinggi.',
     icon: LayoutTemplate,
     color: 'from-violet-400 via-purple-400 to-fuchsia-500',
     shadow: 'shadow-[0_0_20px_rgba(139,92,246,0.3)]'
