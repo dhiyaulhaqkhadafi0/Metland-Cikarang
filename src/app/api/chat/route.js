@@ -40,9 +40,13 @@ export async function POST(req) {
     let lastError = null;
     for (const modelName of FALLBACK_MODELS) {
       try {
+        let sysInstruct = SMI_SYSTEM_PROMPT;
+        if (context === "legal") sysInstruct = LEGAL_SYSTEM_PROMPT;
+        else if (context === "content-studio") sysInstruct = undefined;
+
         const model = genAI.getGenerativeModel({
           model: modelName,
-          systemInstruction: context === "legal" ? LEGAL_SYSTEM_PROMPT : SMI_SYSTEM_PROMPT,
+          ...(sysInstruct ? { systemInstruction: sysInstruct } : {}),
         });
 
         const chat = model.startChat({ history });

@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Lightbulb, TrendingUp, Activity, Magnet, FileText, 
   Newspaper, Hash, Search, BookOpen, Image as ImageIcon, 
   Wand2, Calendar, RefreshCw, BarChart2, Rocket, 
-  Sparkles, Copy, CheckCircle2, Bot, StopCircle, ArrowRight, ChevronRight
+  Sparkles, Copy, CheckCircle2, Bot, StopCircle, ArrowLeft, ChevronDown
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -15,9 +15,9 @@ const CATEGORIES = [
     title: 'Ideation',
     icon: Lightbulb,
     tools: [
-      { id: 'content-ideas', name: 'AI Content Ideas', icon: Lightbulb, desc: 'Find content ideas based on goals & audience' },
-      { id: 'trend-hunter', name: 'AI Trend Hunter', icon: TrendingUp, desc: 'Discover property trends & adaptations' },
-      { id: 'viral-analyzer', name: 'AI Viral Analyzer', icon: Activity, desc: 'Analyze why content goes viral' },
+      { id: 'content-ideas', name: 'AI Content Ideas', icon: Lightbulb, desc: 'Temukan ratusan ide konten brilian berdasarkan audiens Metland', color: 'from-emerald-400 to-teal-500' },
+      { id: 'trend-hunter', name: 'AI Trend Hunter', icon: TrendingUp, desc: 'Analisis tren viral TikTok & Reels untuk diadopsi ke properti', color: 'from-blue-400 to-indigo-500' },
+      { id: 'viral-analyzer', name: 'AI Viral Analyzer', icon: Activity, desc: 'Bedah anatomi konten kompetitor yang viral dan replikasi', color: 'from-violet-400 to-fuchsia-500' },
     ]
   },
   {
@@ -25,11 +25,11 @@ const CATEGORIES = [
     title: 'Content Writing',
     icon: FileText,
     tools: [
-      { id: 'hook-gen', name: 'AI Hook Generator', icon: Magnet, desc: 'Generate 50 ready-to-use hooks' },
-      { id: 'script-gen', name: 'AI Script Generator', icon: FileText, desc: 'Generate video scripts (TikTok, Reels)' },
-      { id: 'news-writer', name: 'AI Property News', icon: Newspaper, desc: 'Turn news into educational content' },
-      { id: 'hashtag-gen', name: 'AI Hashtag Gen', icon: Hash, desc: 'Generate relevant hashtags' },
-      { id: 'seo-meta', name: 'AI SEO Meta', icon: Search, desc: 'Generate SEO meta data for web' },
+      { id: 'hook-gen', name: 'AI Hook Generator', icon: Magnet, desc: 'Ciptakan kalimat pembuka psikologis yang mustahil di-skip', color: 'from-rose-400 to-orange-500' },
+      { id: 'script-gen', name: 'AI Script Generator', icon: FileText, desc: 'Naskah video lengkap dengan arahan visual dan voiceover', color: 'from-amber-400 to-orange-500' },
+      { id: 'news-writer', name: 'AI Property News', icon: Newspaper, desc: 'Ubah berita properti membosankan jadi konten edukasi seru', color: 'from-cyan-400 to-blue-500' },
+      { id: 'hashtag-gen', name: 'AI Hashtag Gen', icon: Hash, desc: 'Formulasi hashtag SEO dengan kombinasi volume pencarian optimal', color: 'from-emerald-400 to-green-500' },
+      { id: 'seo-meta', name: 'AI SEO Meta', icon: Search, desc: 'Hasilkan meta title & description untuk optimasi website Metland', color: 'from-blue-400 to-sky-500' },
     ]
   },
   {
@@ -37,9 +37,9 @@ const CATEGORIES = [
     title: 'Content Design',
     icon: ImageIcon,
     tools: [
-      { id: 'carousel-gen', name: 'AI Carousel Gen', icon: BookOpen, desc: 'Generate IG carousel content' },
-      { id: 'thumbnail-maker', name: 'AI Thumbnail Maker', icon: ImageIcon, desc: 'Generate thumbnail layouts & prompts' },
-      { id: 'image-prompt', name: 'AI Image Prompt', icon: Wand2, desc: 'Generate prompts for Midjourney/Flux' },
+      { id: 'carousel-gen', name: 'AI Carousel Gen', icon: BookOpen, desc: 'Konsep carousel edukatif multi-slide untuk Instagram/LinkedIn', color: 'from-fuchsia-400 to-pink-500' },
+      { id: 'thumbnail-maker', name: 'AI Thumbnail Maker', icon: ImageIcon, desc: 'Ide tata letak dan copywriting memikat untuk thumbnail YouTube/Video', color: 'from-red-400 to-rose-500' },
+      { id: 'image-prompt', name: 'AI Image Prompt', icon: Wand2, desc: 'Prompt sakti Midjourney/Flux untuk merender visual properti estetik', color: 'from-purple-400 to-indigo-500' },
     ]
   },
   {
@@ -47,8 +47,8 @@ const CATEGORIES = [
     title: 'Publishing',
     icon: Calendar,
     tools: [
-      { id: 'content-calendar', name: 'AI Content Calendar', icon: Calendar, desc: 'Generate 30-90 days posting schedule' },
-      { id: 'repurposer', name: 'AI Content Repurposer', icon: RefreshCw, desc: 'Turn 1 content into many formats' },
+      { id: 'content-calendar', name: 'AI Content Calendar', icon: Calendar, desc: 'Jadwal tayang 30 hari komprehensif lengkap dengan pilar konten', color: 'from-teal-400 to-emerald-500' },
+      { id: 'repurposer', name: 'AI Content Repurposer', icon: RefreshCw, desc: 'Sulap 1 video panjang menjadi 10 format konten berbeda secara instan', color: 'from-indigo-400 to-cyan-500' },
     ]
   },
   {
@@ -56,7 +56,7 @@ const CATEGORIES = [
     title: 'Optimization',
     icon: BarChart2,
     tools: [
-      { id: 'evaluator', name: 'AI Content Evaluator', icon: BarChart2, desc: 'Score & evaluate your content quality' },
+      { id: 'evaluator', name: 'AI Content Evaluator', icon: BarChart2, desc: 'Skoring kualitas konten Anda sebelum di-publish beserta revisinya', color: 'from-orange-400 to-red-500' },
     ]
   },
   {
@@ -64,15 +64,17 @@ const CATEGORIES = [
     title: 'Campaign',
     icon: Rocket,
     tools: [
-      { id: 'campaign-builder', name: 'AI Campaign Builder', icon: Rocket, desc: 'Build full marketing campaigns' },
+      { id: 'campaign-builder', name: 'AI Campaign Builder', icon: Rocket, desc: 'Arsitektur end-to-end marketing campaign untuk peluncuran cluster baru', color: 'from-yellow-400 to-amber-500' },
     ]
   }
 ];
 
 export default function ContentStudioClient() {
-  const [activeTool, setActiveTool] = useState('content-ideas');
+  // Navigation State
+  const [activeTool, setActiveTool] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   
-  // Form State
+  // Form State (for specific tools)
   const [cluster, setCluster] = useState('Semua Cluster Metland Cikarang');
   const [context, setContext] = useState('');
   
@@ -83,9 +85,6 @@ export default function ContentStudioClient() {
   
   const abortControllerRef = useRef<AbortController | null>(null);
   const outputEndRef = useRef<HTMLDivElement>(null);
-
-  const activeCategory = CATEGORIES.find(c => c.tools.some(t => t.id === activeTool));
-  const currentToolData = activeCategory?.tools.find(t => t.id === activeTool);
 
   // Auto-scroll output to bottom while streaming
   useEffect(() => {
@@ -115,17 +114,13 @@ Konteks / Arahan spesifik dari user: ${context || 'Tidak ada spesifik, berikan i
         return `${base}\n\nTUGAS UTAMA: Analisis tren TikTok/Reels/Instagram saat ini dan jabarkan bagaimana tren tersebut bisa diadopsi (riding the wave) untuk menjual properti Metland. Berikan 5 ide eksekusi tren spesifik beserta saran lagu/soundtrack yang relevan.`;
       case 'hook-gen':
         return `${base}\n\nTUGAS UTAMA: Buatkan 20 kalimat HOOK (untuk detik ke 1-3 video pendek) yang sangat memancing rasa penasaran audiens secara psikologis ekstrem agar mereka tidak men-scroll (scroll-stopping). Jangan gunakan gaya bahasa kaku, buat seakan-akan konten kreator top yang berbicara.`;
-      case 'script-gen':
-        return `${base}\n\nTUGAS UTAMA: Buatkan 1 naskah video TikTok/Reels lengkap (durasi 45-60 detik) untuk properti ini. Pisahkan dalam kolom/format jelas antara [VISUAL / KAMERA] (apa yang ditampilkan di layar) dan [AUDIO / VOICEOVER] (apa yang diucapkan).`;
-      case 'carousel-gen':
-        return `${base}\n\nTUGAS UTAMA: Buatkan konsep konten Carousel Instagram/LinkedIn (5-7 slide). Tuliskan teks/headline tebal untuk setiap slide dan deskripsi visual gambar yang harus didesain oleh tim grafis.`;
       default:
         return `${base}\n\nTUGAS UTAMA: Hasilkan output luar biasa kreatif dan marketing-oriented berdasarkan tool yang dipilih dan konteks di atas. Gunakan formatting Markdown yang rapi.`;
     }
   };
 
   const handleGenerate = async () => {
-    if (!currentToolData) return;
+    if (!activeTool) return;
     
     // Reset state
     setOutput('');
@@ -140,7 +135,7 @@ Konteks / Arahan spesifik dari user: ${context || 'Tidak ada spesifik, berikan i
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [{ role: 'user', content: getSystemPrompt() }],
-          context: 'smi'
+          context: 'content-studio' // Using the newly configured context that bypasses SMI default
         }),
         signal: abortControllerRef.current.signal
       });
@@ -162,7 +157,6 @@ Konteks / Arahan spesifik dari user: ${context || 'Tidak ada spesifik, berikan i
         if (value) {
           const chunk = decoder.decode(value, { stream: true });
           
-          // Parse the X-Vercel-AI-Data-Stream format which uses `0:"text"\n`
           const lines = chunk.split('\n');
           for (const line of lines) {
             if (line.startsWith('0:')) {
@@ -201,232 +195,247 @@ Konteks / Arahan spesifik dari user: ${context || 'Tidak ada spesifik, berikan i
     setTimeout(() => setIsCopied(false), 2000);
   };
 
-  return (
-    <div className="relative flex h-[calc(100vh-6rem)] w-full rounded-[2.5rem] bg-[#030712] overflow-hidden backdrop-blur-3xl border border-white/5 shadow-[0_0_100px_rgba(0,0,0,0.5)] font-sans">
-      
-      {/* Dynamic Animated Background - Liquid Aurora */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-[0.15]">
-        <motion.div 
-          animate={{ 
-            rotate: [0, 90, 180, 270, 360],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full bg-emerald-500/20 mix-blend-screen blur-[120px]"
-        />
-        <motion.div 
-          animate={{ 
-            rotate: [360, 270, 180, 90, 0],
-            scale: [1, 1.5, 1],
-          }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-          className="absolute -bottom-[20%] -right-[10%] w-[60vw] h-[60vw] rounded-full bg-indigo-500/20 mix-blend-screen blur-[120px]"
-        />
+  const filteredCategories = useMemo(() => {
+    if (!searchQuery.trim()) return CATEGORIES;
+    const query = searchQuery.toLowerCase();
+    
+    return CATEGORIES.map(cat => ({
+      ...cat,
+      tools: cat.tools.filter(t => 
+        t.name.toLowerCase().includes(query) || 
+        t.desc.toLowerCase().includes(query)
+      )
+    })).filter(cat => cat.tools.length > 0);
+  }, [searchQuery]);
+
+  // Dashboard View Component (Landing Page)
+  const renderDashboard = () => (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="w-full h-full flex flex-col pt-8 pb-24 px-8 md:px-16 overflow-y-auto custom-scrollbar"
+    >
+      {/* Hero Section */}
+      <div className="flex flex-col items-center justify-center text-center mb-16 relative z-10">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 20 }}
+          className="mb-6 p-4 rounded-3xl bg-gradient-to-br from-emerald-500/20 to-teal-900/40 backdrop-blur-xl border border-emerald-500/30 shadow-[0_0_50px_rgba(16,185,129,0.2)]"
+        >
+          <Sparkles size={40} className="text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.8)]" />
+        </motion.div>
+        <h1 className="text-5xl md:text-6xl font-black mb-6 tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-500 drop-shadow-lg">
+          AI Content <span className="text-emerald-400">Studio</span>
+        </h1>
+        <p className="text-slate-400 text-lg md:text-xl font-light max-w-2xl leading-relaxed mb-10">
+          Supercharge strategi digital marketing Anda. Pilih AI Copilot Anda untuk meriset, merancang, dan memproduksi konten kelas dunia dalam hitungan detik.
+        </p>
+        
+        {/* Search Bar */}
+        <div className="w-full max-w-xl relative group">
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-emerald-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+          <div className="relative bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl flex items-center p-2 shadow-2xl transition-all duration-300 focus-within:border-emerald-500/50 focus-within:shadow-[0_0_30px_rgba(16,185,129,0.15)]">
+            <Search className="text-slate-400 ml-4 mr-3" size={24} />
+            <input 
+              type="text" 
+              placeholder="Cari AI tools (Cth: Hook Generator, Ide Konten, SEO...)" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 bg-transparent text-white placeholder:text-slate-500 py-3 px-2 outline-none text-lg font-light tracking-wide"
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Floating Sidebar Container */}
-      <div className="w-80 h-full p-4 relative z-10 flex flex-col">
-        <div className="h-full bg-white/5 backdrop-blur-3xl border border-white/5 rounded-3xl overflow-hidden flex flex-col shadow-2xl relative">
-          
-          {/* Glass Header */}
-          <div className="p-6 sticky top-0 bg-black/10 backdrop-blur-xl border-b border-white/5 z-20">
-            <div className="flex items-center gap-3">
-              <motion.div 
-                initial={{ rotate: -90, scale: 0 }}
-                animate={{ rotate: 0, scale: 1 }}
-                transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                className="p-2.5 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-              >
-                <Sparkles size={20} className="drop-shadow-md" />
-              </motion.div>
+      {/* Grid Categories */}
+      <div className="space-y-16 relative z-10 max-w-7xl mx-auto w-full">
+        {filteredCategories.length === 0 ? (
+          <div className="text-center text-slate-500 py-20 flex flex-col items-center">
+            <Bot size={48} className="mb-4 opacity-50" />
+            <p className="text-lg">Tidak ada AI Tool yang cocok dengan pencarian Anda.</p>
+          </div>
+        ) : (
+          filteredCategories.map((category, idx) => (
+            <motion.div 
+              key={category.id}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className="space-y-6"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-2xl bg-white/5 border border-white/10 text-slate-300 backdrop-blur-sm">
+                  <category.icon size={20} />
+                </div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">{category.title}</h2>
+                <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent ml-4" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {category.tools.map((tool) => (
+                  <div
+                    key={tool.id}
+                    onClick={() => {
+                      setActiveTool(tool.id);
+                      setOutput('');
+                    }}
+                    className="group cursor-pointer bg-[#1A1C23]/60 backdrop-blur-xl rounded-[2rem] p-6 border border-white/5 hover:border-white/15 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden flex flex-col h-full"
+                  >
+                    {/* Glassmorphism gradient effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                    
+                    {/* Glowing orb in corner */}
+                    <div className={`absolute -top-16 -right-16 w-32 h-32 rounded-full bg-gradient-to-br ${tool.color} blur-[60px] opacity-20 group-hover:opacity-40 transition-opacity duration-500 pointer-events-none`} />
+
+                    <div className="relative z-10 flex flex-col h-full">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className={`p-4 rounded-2xl bg-black/40 border border-white/5 shadow-inner group-hover:scale-110 transition-transform duration-500 ease-out`}>
+                          <tool.icon size={28} className={`text-transparent bg-clip-text bg-gradient-to-br ${tool.color}`} />
+                        </div>
+                      </div>
+                      
+                      <h3 className="text-xl font-bold text-white mb-3 tracking-tight group-hover:text-emerald-400 transition-colors duration-300">{tool.name}</h3>
+                      <p className="text-slate-400 text-sm leading-relaxed font-light flex-1">
+                        {tool.desc}
+                      </p>
+                      
+                      <div className="mt-6 flex items-center text-[11px] font-bold tracking-[0.2em] text-slate-500 uppercase group-hover:text-emerald-400 transition-colors">
+                        Launch Tool <ArrowLeft className="ml-2 rotate-180" size={14} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          ))
+        )}
+      </div>
+    </motion.div>
+  );
+
+  // Content Ideas Tool View (Spacious Layout)
+  const renderContentIdeasTool = () => {
+    const currentToolData = CATEGORIES.flatMap(c => c.tools).find(t => t.id === 'content-ideas');
+    
+    return (
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="w-full h-full flex flex-col relative"
+      >
+        {/* Tool Header */}
+        <div className="h-20 shrink-0 border-b border-white/5 bg-black/20 backdrop-blur-2xl flex items-center px-8 justify-between z-20">
+          <div className="flex items-center gap-6">
+            <button 
+              onClick={() => setActiveTool(null)}
+              className="p-3 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-all group"
+            >
+              <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+            </button>
+            <div className="w-px h-8 bg-white/10" />
+            <div className="flex items-center gap-4">
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-400/20 to-teal-500/20 border border-emerald-500/30">
+                <Lightbulb size={24} className="text-emerald-400" />
+              </div>
               <div>
-                <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Content Studio</h2>
-                <p className="text-[10px] text-emerald-400 font-bold tracking-[0.2em] uppercase mt-0.5 opacity-80">Metland AI Engine</p>
+                <h2 className="text-xl font-bold text-white">{currentToolData?.name}</h2>
+                <p className="text-xs text-emerald-400 font-bold tracking-wider uppercase">{currentToolData?.desc}</p>
               </div>
             </div>
           </div>
-
-          {/* Tools List */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-8 hidden-scrollbar pb-10">
-            {CATEGORIES.map((category, catIdx) => (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: catIdx * 0.1 }}
-                key={category.id}
-              >
-                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-3 flex items-center gap-2">
-                  <category.icon size={12} className="opacity-70" />
-                  {category.title}
-                </h3>
-                <div className="space-y-1.5 relative">
-                  {category.tools.map((tool) => {
-                    const isActive = activeTool === tool.id;
-                    return (
-                      <button
-                        key={tool.id}
-                        onClick={() => {
-                          if (isGenerating) return; 
-                          setActiveTool(tool.id); 
-                          setOutput(''); 
-                        }}
-                        className={`w-full text-left px-4 py-3.5 rounded-2xl transition-all duration-300 relative group outline-none ${
-                          isGenerating && !isActive ? 'opacity-30 cursor-not-allowed' : ''
-                        }`}
-                      >
-                        {isActive && (
-                          <motion.div
-                            layoutId="activeToolBg"
-                            className="absolute inset-0 bg-white/10 border border-white/10 rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.03)]"
-                            initial={false}
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                          />
-                        )}
-                        
-                        <div className="relative z-10 flex items-center gap-3">
-                          <div className={`p-2 rounded-xl transition-all duration-300 ${isActive ? 'bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.5)] scale-110' : 'bg-white/5 text-slate-400 group-hover:bg-white/10 group-hover:text-slate-200 group-hover:scale-105'}`}>
-                            <tool.icon size={16} />
-                          </div>
-                          <div className="flex-1 truncate">
-                            <div className={`text-sm font-semibold transition-colors ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'}`}>
-                              {tool.name}
-                            </div>
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Main Workspace */}
-      <div className="flex-1 flex flex-col h-full relative z-10 py-4 pr-4 pl-0">
-        
-        {/* Top Floating Header */}
-        <div className="h-16 mb-4 bg-white/5 backdrop-blur-2xl border border-white/5 rounded-[2rem] flex items-center px-8 shadow-xl">
-          <div className="flex items-center gap-3 text-slate-400 text-sm">
-            <span className="font-medium tracking-widest uppercase text-[10px] opacity-70">{activeCategory?.title}</span>
-            <ChevronRight size={14} className="opacity-40" />
-            <motion.div 
-              key={activeTool} 
-              initial={{ opacity: 0, x: -10 }} 
-              animate={{ opacity: 1, x: 0 }} 
-              className="text-white font-bold flex items-center gap-2 text-sm"
-            >
-              {currentToolData?.icon && <currentToolData.icon size={16} className="text-emerald-400" />}
-              {currentToolData?.name}
-            </motion.div>
-          </div>
         </div>
 
-        {/* Content Area - Split Pane */}
-        <div className="flex-1 flex gap-4 h-[calc(100%-5rem)]">
-          
-          {/* Input Panel */}
-          <div className="w-[45%] h-full bg-white/5 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-8 flex flex-col shadow-2xl relative overflow-hidden group">
-            {/* Ambient inner glow */}
-            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none"></div>
-            
-            <motion.div 
-              key={activeTool + "-desc"}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-8 relative z-10"
-            >
-              <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-500 mb-3 tracking-tight">
-                {currentToolData?.name}
-              </h3>
-              <p className="text-slate-400 font-light leading-relaxed text-sm">{currentToolData?.desc}</p>
-            </motion.div>
+        {/* Workspace - Very Spacious Split View */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* LEFT: Config Panel */}
+          <div className="w-[40%] min-w-[400px] border-r border-white/5 bg-black/10 backdrop-blur-xl p-8 lg:p-12 flex flex-col overflow-y-auto custom-scrollbar relative">
+            <div className="max-w-md mx-auto w-full space-y-10">
+              <div className="space-y-2">
+                <h3 className="text-3xl font-black text-white tracking-tight">Setup Ideation</h3>
+                <p className="text-slate-400 text-sm leading-relaxed font-light">Tentukan target perumahan dan berikan arahan spesifik agar AI dapat meracik konten yang tepat sasaran.</p>
+              </div>
 
-            <div className="space-y-6 flex-1 relative z-10">
-              <div className="space-y-3">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+              <div className="space-y-4">
+                <label className="text-[11px] font-bold text-emerald-400 uppercase tracking-[0.2em] flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]"></div>
-                  Cluster / Produk Metland
+                  Target Produk / Cluster
                 </label>
                 <div className="relative group/select">
                   <select 
                     value={cluster}
                     onChange={(e) => setCluster(e.target.value)}
-                    className="w-full bg-black/20 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all appearance-none cursor-pointer backdrop-blur-md group-hover/select:bg-white/5"
+                    className="w-full bg-[#1A1C23]/80 border border-white/10 hover:border-emerald-500/30 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 transition-all appearance-none cursor-pointer backdrop-blur-xl"
                   >
                     <option>Semua Cluster Metland Cikarang</option>
                     <option>Cluster Avesa Garden</option>
                     <option>Cluster Lisse</option>
                     <option>Ruko Plaza de Cikarang</option>
                   </select>
-                  <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover/select:text-white transition-colors">
-                    <ChevronRight size={16} className="rotate-90" />
+                  <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover/select:text-emerald-400 transition-colors">
+                    <ChevronDown size={20} />
                   </div>
                 </div>
               </div>
               
-              <div className="space-y-3 flex-1 flex flex-col h-1/2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+              <div className="space-y-4 flex-1">
+                <label className="text-[11px] font-bold text-indigo-400 uppercase tracking-[0.2em] flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]"></div>
-                  Konteks / Arahan Kreatif (Opsional)
+                  Konteks Kreatif Spesifik
                 </label>
                 <textarea 
                   value={context}
                   onChange={(e) => setContext(e.target.value)}
-                  placeholder="Ceritakan apa yang ada di pikiran Anda. Contoh: Buatkan ide untuk ibu muda yang cari rumah 3 kamar dengan cicilan murah..."
-                  className="w-full flex-1 bg-black/20 hover:bg-white/5 border border-white/10 rounded-2xl p-5 text-sm text-white focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none placeholder:text-slate-600 backdrop-blur-md font-light leading-relaxed hidden-scrollbar"
+                  placeholder="Contoh: Fokuskan pada keluarga muda yang mulai start dari cicilan 3 jutaan. Buat gayanya santai dan sedikit humoris."
+                  className="w-full h-48 bg-[#1A1C23]/80 hover:bg-[#1f222b]/80 border border-white/10 hover:border-indigo-500/30 rounded-2xl p-5 text-white focus:outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all resize-none placeholder:text-slate-600 backdrop-blur-xl font-light leading-relaxed custom-scrollbar"
                 />
               </div>
-            </div>
 
-            <div className="mt-8 relative z-10">
-              <AnimatePresence mode="wait">
-                {!isGenerating ? (
-                  <motion.button 
-                    key="generate-btn"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    onClick={handleGenerate}
-                    className="w-full bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 text-slate-900 rounded-2xl px-4 py-4 text-sm font-black tracking-wide transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] flex items-center justify-center gap-3 relative overflow-hidden group"
-                  >
-                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <Sparkles size={20} className="relative z-10" />
-                    <span className="relative z-10">Mulai Generate AI</span>
-                  </motion.button>
-                ) : (
-                  <motion.button 
-                    key="stop-btn"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    onClick={stopGeneration}
-                    className="w-full bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 hover:border-red-500/50 text-red-400 rounded-2xl px-4 py-4 text-sm font-black tracking-wide transition-all shadow-[0_0_20px_rgba(239,68,68,0.1)] flex items-center justify-center gap-3"
-                  >
-                    <StopCircle size={20} />
-                    <span>Hentikan AI</span>
-                  </motion.button>
-                )}
-              </AnimatePresence>
+              <div className="pt-4">
+                <AnimatePresence mode="wait">
+                  {!isGenerating ? (
+                    <motion.button 
+                      key="generate-btn"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      onClick={handleGenerate}
+                      className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 rounded-2xl px-6 py-5 text-base font-black tracking-wide transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_50px_rgba(16,185,129,0.5)] flex items-center justify-center gap-3 relative group"
+                    >
+                      <Sparkles size={24} className="relative z-10" />
+                      <span className="relative z-10">Generate Ide Konten</span>
+                    </motion.button>
+                  ) : (
+                    <motion.button 
+                      key="stop-btn"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      onClick={stopGeneration}
+                      className="w-full bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 text-red-400 rounded-2xl px-6 py-5 text-base font-black tracking-wide transition-all flex items-center justify-center gap-3"
+                    >
+                      <StopCircle size={24} />
+                      <span>Hentikan AI</span>
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
+            
+            {/* Ambient Background for Sidebar */}
+            <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
-          {/* Output Panel */}
-          <div className="w-[55%] h-full bg-black/40 backdrop-blur-3xl border border-white/5 rounded-[2rem] flex flex-col shadow-2xl overflow-hidden relative">
-            
-            {/* Terminal Header */}
-            <div className="h-16 border-b border-white/5 flex items-center justify-between px-6 bg-white/5 backdrop-blur-md z-20">
-              <div className="flex items-center gap-4">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/50"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
-                </div>
-                <div className="w-px h-5 bg-white/10"></div>
-                <span className="text-[10px] font-bold tracking-[0.2em] text-slate-400 flex items-center gap-2">
-                  <Bot size={14} className={isGenerating ? 'text-emerald-400 animate-pulse' : ''} />
-                  {isGenerating ? 'AI SEDANG MENGETIK...' : 'OUTPUT STUDIO'}
+          {/* RIGHT: Output Panel */}
+          <div className="flex-1 bg-black/40 backdrop-blur-3xl flex flex-col relative overflow-hidden">
+            {/* Output Header */}
+            <div className="h-16 shrink-0 border-b border-white/5 flex items-center justify-between px-8 bg-black/20 z-20">
+              <div className="flex items-center gap-3">
+                <Bot size={18} className={isGenerating ? 'text-emerald-400 animate-pulse' : 'text-slate-500'} />
+                <span className="text-xs font-bold tracking-[0.2em] text-slate-400">
+                  {isGenerating ? 'AI SEDANG MENYUSUN IDE...' : 'AI OUTPUT WORKSPACE'}
                 </span>
               </div>
               
@@ -435,62 +444,132 @@ Konteks / Arahan spesifik dari user: ${context || 'Tidak ada spesifik, berikan i
                   <motion.button 
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
                     onClick={copyToClipboard}
-                    className={`px-3 py-1.5 rounded-xl transition-all duration-300 flex items-center gap-2 text-xs font-bold ${
+                    className={`px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2 text-xs font-bold ${
                       isCopied 
-                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                        : 'bg-white/5 text-slate-300 hover:bg-white/10 border border-transparent'
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
+                        : 'bg-white/5 text-slate-300 hover:bg-white/10 border border-white/10'
                     }`}
                   >
-                    {isCopied ? <CheckCircle2 size={14} /> : <Copy size={14} />}
-                    {isCopied ? 'Tersalin!' : 'Copy Text'}
+                    {isCopied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
+                    {isCopied ? 'Tersalin ke Clipboard!' : 'Copy Semua'}
                   </motion.button>
                 )}
               </AnimatePresence>
             </div>
 
-            {/* Output Display */}
-            <div className="flex-1 overflow-y-auto p-8 relative z-10 custom-scrollbar scroll-smooth">
+            {/* Editor Content Area */}
+            <div className="flex-1 overflow-y-auto p-10 lg:p-16 relative z-10 custom-scrollbar scroll-smooth bg-[#0D0F14]">
               {!output && !isGenerating ? (
-                <div className="h-full flex flex-col items-center justify-center text-slate-500 opacity-60">
+                <div className="h-full flex flex-col items-center justify-center text-slate-500">
                   <motion.div 
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ type: "spring", delay: 0.2 }}
-                    className="w-32 h-32 mb-6 rounded-full border border-white/5 flex items-center justify-center bg-white/5 shadow-[inset_0_0_50px_rgba(255,255,255,0.02)] relative overflow-hidden"
+                    className="w-40 h-40 mb-8 rounded-[3rem] border border-white/5 flex items-center justify-center bg-white/5 shadow-[inset_0_0_50px_rgba(255,255,255,0.02)] relative overflow-hidden"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-50"></div>
-                    <currentToolData.icon size={48} strokeWidth={1} className="relative z-10 text-slate-400" />
+                    <Lightbulb size={64} strokeWidth={1} className="relative z-10 text-slate-400" />
                   </motion.div>
-                  <p className="text-sm text-center max-w-sm font-light leading-relaxed tracking-wide">
-                    Pilih parameter di sebelah kiri lalu klik tombol <strong className="font-bold text-white tracking-normal">Generate</strong> untuk melihat keajaiban dari objektivitas AI Metland.
+                  <h3 className="text-2xl font-light text-white mb-3">Kanvas Masih Kosong</h3>
+                  <p className="text-base text-center max-w-md font-light leading-relaxed opacity-60">
+                    Atur preferensi audiens Anda di panel sebelah kiri dan mulailah proses *brainstorming* magis.
                   </p>
                 </div>
               ) : (
-                <div className="relative font-mono md:font-sans">
-                  {/* Prose formatting for markdown-like display */}
-                  <div className="prose prose-invert max-w-none prose-p:leading-loose prose-headings:font-bold prose-headings:text-white prose-a:text-emerald-400 marker:text-emerald-500 prose-strong:text-emerald-300 prose-ul:my-4 prose-li:my-2 text-slate-300 font-light text-[15px] whitespace-pre-wrap tracking-wide">
+                <div className="max-w-4xl mx-auto font-sans">
+                  <div className="prose prose-invert max-w-none prose-p:leading-loose prose-p:text-slate-300 prose-headings:font-bold prose-headings:text-white prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-a:text-emerald-400 marker:text-emerald-500 prose-strong:text-emerald-300 prose-ul:my-6 prose-li:my-3 prose-li:leading-relaxed text-slate-300 font-light text-base lg:text-lg whitespace-pre-wrap tracking-wide">
                     {output}
                     {isGenerating && (
                       <motion.span 
                         animate={{ opacity: [1, 0, 1] }} 
                         transition={{ repeat: Infinity, duration: 0.8 }}
-                        className="inline-block w-2.5 h-4 bg-emerald-400 ml-1 translate-y-1 rounded-sm shadow-[0_0_10px_rgba(16,185,129,0.8)]"
+                        className="inline-block w-3 h-5 bg-emerald-400 ml-2 translate-y-1 rounded-sm shadow-[0_0_10px_rgba(16,185,129,0.8)]"
                       />
                     )}
                   </div>
-                  <div ref={outputEndRef} className="h-8" />
+                  <div ref={outputEndRef} className="h-16" />
                 </div>
               )}
             </div>
-
-            {/* Ambient Output Glow */}
+            
+            {/* Ambient Output Glow (Bottom) */}
             {isGenerating && (
-              <div className="absolute bottom-0 left-0 right-0 h-[30%] bg-gradient-to-t from-emerald-500/5 to-transparent pointer-events-none mix-blend-screen z-0 animate-pulse"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-emerald-500/10 to-transparent pointer-events-none mix-blend-screen z-0 animate-pulse" />
             )}
           </div>
         </div>
+      </motion.div>
+    );
+  };
+
+  // Generic Placeholder Tool View
+  const renderPlaceholderTool = () => {
+    const currentToolData = CATEGORIES.flatMap(c => c.tools).find(t => t.id === activeTool);
+    if (!currentToolData) return null;
+
+    return (
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="w-full h-full flex flex-col relative items-center justify-center p-8 text-center"
+      >
+        <button 
+          onClick={() => setActiveTool(null)}
+          className="absolute top-8 left-8 p-3 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 transition-all group flex items-center gap-3 backdrop-blur-xl border border-white/10"
+        >
+          <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+          <span className="text-sm font-bold tracking-wide">Kembali ke Studio</span>
+        </button>
+
+        <div className={`p-8 rounded-[3rem] bg-gradient-to-br ${currentToolData.color} bg-opacity-10 backdrop-blur-3xl border border-white/10 shadow-2xl mb-8 group-hover:scale-105 transition-transform`}>
+          <currentToolData.icon size={80} className="text-white drop-shadow-lg" />
+        </div>
+        
+        <h2 className="text-4xl md:text-5xl font-black text-white mb-6 tracking-tight">{currentToolData.name}</h2>
+        <p className="text-xl text-slate-400 font-light max-w-2xl leading-relaxed mb-12">
+          Fitur ini sedang dalam tahap *brainstorming* dan pengembangan. Kami merancang arsitektur AI khusus agar sesuai dengan kebutuhan Metland Cikarang. Nantikan segera!
+        </p>
+
+        <div className="px-6 py-3 rounded-full border border-white/10 bg-white/5 text-sm font-bold tracking-[0.2em] text-slate-500 uppercase">
+          Coming Soon
+        </div>
+      </motion.div>
+    );
+  };
+
+  return (
+    <div className="relative flex h-[calc(100vh-6rem)] w-full rounded-[2.5rem] bg-[#030508] overflow-hidden backdrop-blur-3xl border border-white/5 shadow-[0_0_100px_rgba(0,0,0,0.5)] font-sans">
+      
+      {/* Background Ambience applied globally */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-20">
+        <motion.div 
+          animate={{ 
+            rotate: [0, 90, 180, 270, 360],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full bg-emerald-500/10 mix-blend-screen blur-[120px]"
+        />
+        <motion.div 
+          animate={{ 
+            rotate: [360, 270, 180, 90, 0],
+            scale: [1, 1.5, 1],
+          }}
+          transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-[20%] -right-[10%] w-[60vw] h-[60vw] rounded-full bg-indigo-500/10 mix-blend-screen blur-[120px]"
+        />
       </div>
+
+      <AnimatePresence mode="wait">
+        {activeTool === null 
+          ? <motion.div key="dashboard" className="w-full h-full relative z-10">{renderDashboard()}</motion.div> 
+          : activeTool === 'content-ideas'
+            ? <motion.div key="tool-ideas" className="w-full h-full relative z-10">{renderContentIdeasTool()}</motion.div>
+            : <motion.div key="tool-placeholder" className="w-full h-full relative z-10">{renderPlaceholderTool()}</motion.div>
+        }
+      </AnimatePresence>
     </div>
   );
 }
