@@ -94,9 +94,9 @@ export default function CampaignGenerator({ onGenerated }: { onGenerated: () => 
         </div>
 
         {/* Section 2: Destination & Platform */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Platform (Sumber Iklan)</label>
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Platform</label>
             <select required name="platform" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:border-emerald-500/50 outline-none cursor-pointer transition-all">
               <option value="Facebook Ads" className="bg-[#0B0F14]">Facebook Ads</option>
               <option value="Instagram Ads" className="bg-[#0B0F14]">Instagram Ads</option>
@@ -109,14 +109,22 @@ export default function CampaignGenerator({ onGenerated }: { onGenerated: () => 
           <div>
             <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Sub-cluster / Unit Target</label>
             <select required name="cluster" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:border-emerald-500/50 outline-none cursor-pointer transition-all">
-              <option value="Semua Unit" className="bg-[#0B0F14]">Semua Unit (Landing Page)</option>
+              <option value="Semua Unit" className="bg-[#0B0F14]">Semua Unit</option>
               <optgroup label="Avesa Garden" className="bg-[#0B0F14] text-emerald-400 font-bold">
-                <option value="Canary" className="bg-[#0B0F14] text-white">Canary</option>
-                <option value="Derora" className="bg-[#0B0F14] text-white">Derora</option>
+                <option value="Canary (Tipe 22/72)" className="bg-[#0B0F14] text-white">Canary - Tipe 22/72</option>
+                <option value="Canary (Tipe 30/72)" className="bg-[#0B0F14] text-white">Canary - Tipe 30/72</option>
+                <option value="Derora (Tipe 33/72)" className="bg-[#0B0F14] text-white">Derora - Tipe 33/72</option>
+                <option value="Derora (Tipe 59/84)" className="bg-[#0B0F14] text-white">Derora - Tipe 59/84</option>
               </optgroup>
               <optgroup label="Brassia Garden" className="bg-[#0B0F14] text-emerald-400 font-bold">
-                <option value="Myzora" className="bg-[#0B0F14] text-white">Myzora</option>
-                <option value="Ellyra" className="bg-[#0B0F14] text-white">Ellyra</option>
+                <option value="Myzora (Tipe 33/72)" className="bg-[#0B0F14] text-white">Myzora - Tipe 33/72</option>
+                <option value="Myzora (Tipe 45/72)" className="bg-[#0B0F14] text-white">Myzora - Tipe 45/72</option>
+                <option value="Myzora (Tipe 56/84)" className="bg-[#0B0F14] text-white">Myzora - Tipe 56/84</option>
+                <option value="Myzora (Tipe 77/98)" className="bg-[#0B0F14] text-white">Myzora - Tipe 77/98</option>
+                <option value="Ellyra (Tipe 45/72)" className="bg-[#0B0F14] text-white">Ellyra - Tipe 45/72</option>
+                <option value="Ellyra (Tipe 56/84)" className="bg-[#0B0F14] text-white">Ellyra - Tipe 56/84</option>
+                <option value="Ellyra (Tipe 56/98)" className="bg-[#0B0F14] text-white">Ellyra - Tipe 56/98</option>
+                <option value="Brassia Garden" className="bg-[#0B0F14] text-white">Brassia (General)</option>
               </optgroup>
               <optgroup label="Komersial" className="bg-[#0B0F14] text-emerald-400 font-bold">
                 <option value="Ruko Easton" className="bg-[#0B0F14] text-white">Ruko Easton</option>
@@ -125,12 +133,23 @@ export default function CampaignGenerator({ onGenerated }: { onGenerated: () => 
             </select>
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Link Target Landing Page</label>
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Link Target URL</label>
             <div className="relative">
               <Globe size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
               <input 
                 name="original_url" 
                 placeholder="https://metland.id/discover" 
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500/50 outline-none transition-all" 
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Custom Shortlink (Opsional)</label>
+            <div className="relative">
+              <LinkIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input 
+                name="custom_short_code" 
+                placeholder="Misal: promo-myzora" 
                 className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500/50 outline-none transition-all" 
               />
             </div>

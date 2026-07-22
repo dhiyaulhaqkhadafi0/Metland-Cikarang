@@ -6,13 +6,6 @@ export async function generateCampaignLink(formData: FormData) {
   try {
     const supabase = await createClient();
     
-    // Generator kode acak (Shortcode 6 digit)
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let shortCode = '';
-    for (let i = 0; i < 6; i++) {
-      shortCode += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    
     // Ambil data dari formulir
     const salesName = formData.get("sales_name") as string;
     const platform = formData.get("platform") as string;
@@ -21,6 +14,26 @@ export async function generateCampaignLink(formData: FormData) {
     const originalUrl = formData.get("original_url") as string || '/';
     const metaPixelId = formData.get("meta_pixel_id") as string || null;
     const tiktokPixelId = formData.get("tiktok_pixel_id") as string || null;
+    const customShortCode = formData.get("custom_short_code") as string;
+
+    // Tentukan shortcode
+    let shortCode = '';
+    if (customShortCode && customShortCode.trim() !== '') {
+      // Format custom shortcode: hapus spasi, ubah ke lowercase, hanya alfanumerik dan strip
+      shortCode = customShortCode.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+      
+      // Cek apakah custom shortcode sudah dipakai
+      const { data: existing } = await supabase.from('campaign_links').select('id').eq('short_code', shortCode).single();
+      if (existing) {
+        return { success: false, error: 'Custom shortlink sudah digunakan, silakan pilih nama lain.' };
+      }
+    } else {
+      // Generator kode acak (Shortcode 6 digit)
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      for (let i = 0; i < 6; i++) {
+        shortCode += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+    }
 
     const payload: any = {
       short_code: shortCode,

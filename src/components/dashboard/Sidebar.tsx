@@ -18,8 +18,9 @@ export function Sidebar({ isCollapsed }: { isCollapsed?: boolean }) {
   return (
     <aside className={`h-screen bg-[#0B0F14] border-r border-white/10 flex flex-col hidden md:flex sticky top-0 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
       <div className={`p-6 ${isCollapsed ? 'px-3 text-center' : ''}`}>
-        <Link href="/dashboard" className="inline-block">
-          <span className={`font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300 drop-shadow-[0_0_15px_rgba(52,211,153,0.3)] transition-all ${isCollapsed ? 'text-xl' : 'text-2xl'}`}>
+        <Link href="/dashboard" className="inline-block group relative">
+          <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500 to-teal-400 rounded-lg blur opacity-20 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
+          <span className={`relative font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300 drop-shadow-[0_0_15px_rgba(52,211,153,0.3)] transition-all ${isCollapsed ? 'text-xl' : 'text-2xl'}`}>
             {isCollapsed ? 'M.' : 'Metland.'}
           </span>
         </Link>
