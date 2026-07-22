@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { 
   ArrowLeft, Monitor, Tablet, Smartphone, ZoomIn, ZoomOut, 
   PanelLeftClose, PanelLeftOpen, Save, Send, Layout, LayoutTemplate, 
   Settings, Type, Image as ImageIcon, LayoutGrid, Layers, BarChart3, 
   ChevronDown, CheckCircle2, Play, Wand2, Paintbrush, FileText, ChevronLeft,
-  Search, Eye, Box, AlertTriangle, ArrowRight, MousePointer2, Plus, Trash2, RefreshCw,
+  Search, Eye, Box, AlertTriangle, ArrowRight, MousePointer2, Plus, Trash2, RefreshCw, Upload,
   Globe, Target, BrainCircuit, Undo, RotateCcw,
   Video, List, MessageSquare, HelpCircle, GalleryHorizontal, 
   MousePointerClick, Code, PlaySquare, Navigation, Minus, FileCode2,
@@ -60,7 +60,7 @@ export default function FunnelBuilderClient() {
   const [heroSubtitle, setHeroSubtitle] = useState("Uang habis buat bayar kontrakan tapi ga ada bekasnya? RUGI DONG 😆. Nih mending cobain Myzora, Rumah bagus, cicilan 3 jutaan doank masa?");
   
   // Target Text Selection ('headline' | 'gradient' | 'subtitle' | 'badge')
-  const [textTarget, setTextTarget] = useState<'headline' | 'gradient' | 'subtitle' | 'badge'>('subtitle');
+  const [textTarget, setTextTarget] = useState<'headline' | 'gradient' | 'subtitle' | 'badge'>('headline');
 
   // Rich Text Formatting & Typography States
   const [isDarkEditorBg, setIsDarkEditorBg] = useState(true);
@@ -69,11 +69,11 @@ export default function FunnelBuilderClient() {
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right' | 'justify'>('center');
-  const [headingType, setHeadingType] = useState<string>('Paragraph');
-  const [fontSizePx, setFontSizePx] = useState<string>('18px');
+  const [headingType, setHeadingType] = useState<string>('Heading 1');
+  const [fontSizePx, setFontSizePx] = useState<string>('56px');
   const [fontFamily, setFontFamily] = useState<string>('Inter');
-  const [lineHeight, setLineHeight] = useState<string>('1.5');
-  const [textColor, setTextColor] = useState<string>('#475569');
+  const [lineHeight, setLineHeight] = useState<string>('1.2');
+  const [textColor, setTextColor] = useState<string>('#0f172a');
   const [textBgHighlight, setTextBgHighlight] = useState<string>('transparent');
 
   // Interactive Modals/Popovers inside Rich Text Editor
@@ -83,9 +83,11 @@ export default function FunnelBuilderClient() {
   const [isNumberedList, setIsNumberedList] = useState(false);
   const [isBulletList, setIsBulletList] = useState(false);
 
-  // Advance Desain Background & Responsive Padding States
+  // Advance Desain Background (Solid Color / Background Image Upload) & Responsive Padding States
   const [bgColor, setBgColor] = useState('#ffffff');
   const [bgMode, setBgMode] = useState<'warna' | 'gambar'>('warna');
+  const [sectionBgImage, setSectionBgImage] = useState<string>('');
+  const [bgImageOverlay, setBgImageOverlay] = useState<number>(30); // 0% to 90% opacity
   const [paddingDevice, setPaddingDevice] = useState<Device>('desktop');
   const [paddingConfig, setPaddingConfig] = useState<Record<Device, DevicePadding>>({
     desktop: { top: 0, right: 0, bottom: 0, left: 0 },
@@ -130,6 +132,8 @@ export default function FunnelBuilderClient() {
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [publishProgress, setPublishProgress] = useState(0);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 10, 200));
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 10, 30));
 
@@ -145,6 +149,28 @@ export default function FunnelBuilderClient() {
         return prev + 1;
       });
     }, 1000);
+  };
+
+  // Execute native rich inline formatting on active selection (Word blocking format)
+  const applyInlineFormat = (command: string, value: string | undefined = undefined) => {
+    if (typeof window !== 'undefined') {
+      document.execCommand(command, false, value);
+    }
+  };
+
+  // Handle local image file upload for Latar Background
+  const handleBgImageFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setSectionBgImage(event.target.result as string);
+          setBgMode('gambar');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // Helper to append emoji into target text
@@ -252,6 +278,8 @@ export default function FunnelBuilderClient() {
               setHeroSubtitle("Uang habis buat bayar kontrakan tapi ga ada bekasnya? RUGI DONG 😆. Nih mending cobain Myzora, Rumah bagus, cicilan 3 jutaan doank masa?");
               setHeroImage("https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80");
               setHeroImageZoom(100);
+              setSectionBgImage('');
+              setBgColor('#ffffff');
             }}
             className="p-2 hover:bg-white/5 text-slate-400 rounded-lg transition-colors tooltip mr-2" 
             title="Reset Default"
@@ -423,7 +451,7 @@ export default function FunnelBuilderClient() {
                             <div className="p-5 space-y-6 overflow-y-auto custom-scrollbar">
                               
                               {/* ---------------------------------------------------- */}
-                              {/* 1. TEKS COMPONENT EDITOR (COMPREHENSIVE EXPANDED TOOLBAR) */}
+                              {/* 1. TEKS COMPONENT EDITOR (INLINE WORD SELECTION & FORMATTING) */}
                               {/* ---------------------------------------------------- */}
                               {activeComponent === 'Teks' && (
                                 <>
@@ -461,7 +489,7 @@ export default function FunnelBuilderClient() {
                                     <div className="flex items-center justify-between">
                                       <label className="text-xs font-bold text-slate-400">Isi Konten Teks Live</label>
                                       
-                                      {/* Background Editor Gelap Toggle (Match scalev reference) */}
+                                      {/* Background Editor Gelap Toggle */}
                                       <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsDarkEditorBg(!isDarkEditorBg)}>
                                         <div className={`w-8 h-4 rounded-full transition-colors relative p-0.5 ${isDarkEditorBg ? 'bg-amber-500' : 'bg-slate-600'}`}>
                                           <div className={`w-3 h-3 bg-white rounded-full transition-transform ${isDarkEditorBg ? 'translate-x-4' : 'translate-x-0'}`}></div>
@@ -473,32 +501,32 @@ export default function FunnelBuilderClient() {
                                     {/* Scalev-like 3-Row Comprehensive Toolbar */}
                                     <div className="border border-white/15 rounded-xl overflow-hidden bg-[#161618] shadow-lg">
                                       
-                                      {/* ROW 1: Basic Inline Formatting Controls */}
+                                      {/* ROW 1: Basic Inline Formatting Controls (Supports selection-level formatting) */}
                                       <div className="bg-[#1a1a1c] border-b border-white/10 p-2 flex flex-wrap items-center gap-1.5 relative">
-                                        <button onClick={() => setIsBold(!isBold)} className={`w-8 h-8 flex items-center justify-center rounded font-bold transition-colors ${isBold ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Bold (B)"><Bold size={16} /></button>
-                                        <button onClick={() => setIsItalic(!isItalic)} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isItalic ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Italic (I)"><Italic size={16} /></button>
+                                        <button onClick={() => { setIsBold(!isBold); applyInlineFormat('bold'); }} className={`w-8 h-8 flex items-center justify-center rounded font-bold transition-colors ${isBold ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Bold Kata Terblok (B)"><Bold size={16} /></button>
+                                        <button onClick={() => { setIsItalic(!isItalic); applyInlineFormat('italic'); }} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isItalic ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Italic Kata Terblok (I)"><Italic size={16} /></button>
                                         
                                         {/* Text Color Picker Swatch */}
                                         <div className="relative group flex items-center">
-                                          <label className="w-8 h-8 flex flex-col items-center justify-center rounded hover:bg-white/10 cursor-pointer text-slate-300" title="Warna Teks">
+                                          <label className="w-8 h-8 flex flex-col items-center justify-center rounded hover:bg-white/10 cursor-pointer text-slate-300" title="Warna Teks Kata Terblok">
                                             <Baseline size={16} />
                                             <span className="w-4 h-1 rounded-full mt-0.5" style={{ backgroundColor: textColor }}></span>
-                                            <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="opacity-0 w-0 h-0 absolute" />
+                                            <input type="color" value={textColor} onChange={(e) => { setTextColor(e.target.value); applyInlineFormat('foreColor', e.target.value); }} className="opacity-0 w-0 h-0 absolute" />
                                           </label>
                                         </div>
 
                                         {/* Highlight Background Color Swatch */}
                                         <div className="relative group flex items-center">
-                                          <label className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 cursor-pointer text-slate-300" title="Warna Sorotan Latar Teks">
+                                          <label className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 cursor-pointer text-slate-300" title="Warna Sorotan Kata Terblok">
                                             <Palette size={16} />
-                                            <input type="color" value={textBgHighlight === 'transparent' ? '#ffffff' : textBgHighlight} onChange={(e) => setTextBgHighlight(e.target.value)} className="opacity-0 w-0 h-0 absolute" />
+                                            <input type="color" value={textBgHighlight === 'transparent' ? '#ffffff' : textBgHighlight} onChange={(e) => { setTextBgHighlight(e.target.value); applyInlineFormat('hiliteColor', e.target.value); }} className="opacity-0 w-0 h-0 absolute" />
                                           </label>
                                         </div>
 
-                                        <button onClick={() => setIsUnderline(!isUnderline)} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isUnderline ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Underline (U)"><Underline size={16} /></button>
+                                        <button onClick={() => { setIsUnderline(!isUnderline); applyInlineFormat('underline'); }} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isUnderline ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Underline Kata Terblok (U)"><Underline size={16} /></button>
                                         
                                         {/* Huruf Dicoret / Strikethrough */}
-                                        <button onClick={() => setIsStrikethrough(!isStrikethrough)} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isStrikethrough ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Huruf Dicoret (Strikethrough)"><Strikethrough size={16} /></button>
+                                        <button onClick={() => { setIsStrikethrough(!isStrikethrough); applyInlineFormat('strikeThrough'); }} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isStrikethrough ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Huruf Dicoret (Strikethrough)"><Strikethrough size={16} /></button>
 
                                         <div className="w-px h-6 bg-white/10 mx-0.5"></div>
 
@@ -517,12 +545,17 @@ export default function FunnelBuilderClient() {
                                         <button onClick={() => setTextAlign('right')} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${textAlign === 'right' ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`}><AlignRight size={16} /></button>
                                       </div>
 
-                                      {/* ROW 2: Headings & Font Sizes (Scalev Image 2) */}
+                                      {/* ROW 2: Headings & Font Sizes */}
                                       <div className="bg-[#1a1a1c] border-b border-white/10 p-2 flex items-center gap-2">
-                                        {/* Heading Selector */}
                                         <select 
                                           value={headingType} 
-                                          onChange={(e) => setHeadingType(e.target.value)}
+                                          onChange={(e) => {
+                                            setHeadingType(e.target.value);
+                                            if (e.target.value === 'Heading 1') setFontSizePx('56px');
+                                            else if (e.target.value === 'Heading 2') setFontSizePx('40px');
+                                            else if (e.target.value === 'Heading 3') setFontSizePx('32px');
+                                            else setFontSizePx('18px');
+                                          }}
                                           className="bg-[#0a0a0a] text-xs text-white border border-white/15 rounded-lg px-2.5 h-8 focus:outline-none focus:border-amber-500 flex-1 font-semibold"
                                         >
                                           <option value="Heading 1">Heading 1 (H1)</option>
@@ -532,7 +565,6 @@ export default function FunnelBuilderClient() {
                                           <option value="Paragraph">Paragraph</option>
                                         </select>
 
-                                        {/* Font Size Selector */}
                                         <select 
                                           value={fontSizePx} 
                                           onChange={(e) => setFontSizePx(e.target.value)}
@@ -547,13 +579,13 @@ export default function FunnelBuilderClient() {
                                           <option value="32px">32px</option>
                                           <option value="40px">40px</option>
                                           <option value="48px">48px</option>
+                                          <option value="56px">56px</option>
                                           <option value="64px">64px</option>
                                         </select>
                                       </div>
 
-                                      {/* ROW 3: Page Font, Line Height, Image, Emoji, Formatting */}
+                                      {/* ROW 3: Page Font, Line Height, Emoji, Clear Formatting */}
                                       <div className="bg-[#1a1a1c] border-b border-white/10 p-2 flex items-center gap-2 relative">
-                                        {/* Page Font Dropdown (Many choices) */}
                                         <select 
                                           value={fontFamily} 
                                           onChange={(e) => setFontFamily(e.target.value)}
@@ -564,7 +596,6 @@ export default function FunnelBuilderClient() {
                                           ))}
                                         </select>
 
-                                        {/* Line Height Selector */}
                                         <select 
                                           value={lineHeight} 
                                           onChange={(e) => setLineHeight(e.target.value)}
@@ -578,7 +609,6 @@ export default function FunnelBuilderClient() {
                                           <option value="2.0">2.0</option>
                                         </select>
 
-                                        {/* Emoji Picker Button */}
                                         <button 
                                           onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)}
                                           className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isEmojiPickerOpen ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`}
@@ -587,7 +617,6 @@ export default function FunnelBuilderClient() {
                                           <Smile size={16} />
                                         </button>
 
-                                        {/* Clear formatting */}
                                         <button 
                                           onClick={() => {
                                             setIsBold(false);
@@ -595,8 +624,9 @@ export default function FunnelBuilderClient() {
                                             setIsUnderline(false);
                                             setIsStrikethrough(false);
                                             setTextBgHighlight('transparent');
-                                            setTextColor('#475569');
+                                            setTextColor('#0f172a');
                                             setTextLinkUrl('');
+                                            applyInlineFormat('removeFormat');
                                           }}
                                           className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded text-slate-400 hover:text-rose-400" 
                                           title="Hapus Formatting"
@@ -642,7 +672,10 @@ export default function FunnelBuilderClient() {
                                             className="flex-1 bg-[#161618] border border-white/10 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
                                           />
                                           <button 
-                                            onClick={() => setIsLinkModalOpen(false)} 
+                                            onClick={() => {
+                                              setIsLinkModalOpen(false);
+                                              if (textLinkUrl) applyInlineFormat('createLink', textLinkUrl);
+                                            }} 
                                             className="px-3 py-1.5 bg-amber-500 text-black text-xs font-bold rounded-lg hover:bg-amber-400"
                                           >
                                             Simpan Tautan
@@ -650,7 +683,7 @@ export default function FunnelBuilderClient() {
                                         </div>
                                       )}
 
-                                      {/* Dynamic Textarea Editor (Dark/Light mode compliant) */}
+                                      {/* Dynamic Textarea Editor */}
                                       <textarea 
                                         className={`w-full p-4 text-sm focus:outline-none resize-y min-h-[150px] transition-colors custom-scrollbar ${
                                           isDarkEditorBg ? 'bg-[#0a0a0a] text-white' : 'bg-white text-slate-900 font-semibold'
@@ -662,7 +695,7 @@ export default function FunnelBuilderClient() {
                                     </div>
                                   </div>
 
-                                  {/* Advance Dropdown (Exact Match to Scalev Reference Image 3) */}
+                                  {/* Advance Dropdown (Background Swatches + Image Upload Feature) */}
                                   <div className="border border-white/10 rounded-xl overflow-hidden">
                                     <button 
                                       onClick={() => setIsAdvanceOpen(!isAdvanceOpen)}
@@ -684,9 +717,9 @@ export default function FunnelBuilderClient() {
                                           
                                           <div className="flex gap-2">
                                             <button 
-                                              onClick={() => setBgColor('#ffffff')}
+                                              onClick={() => { setBgColor('#ffffff'); setSectionBgImage(''); }}
                                               className="w-10 h-10 border border-white/20 rounded-xl flex items-center justify-center hover:bg-white/5 text-slate-400 hover:text-white"
-                                              title="Clear Background"
+                                              title="Hapus Latar Gambar & Warna"
                                             >
                                               <X size={18} />
                                             </button>
@@ -704,7 +737,7 @@ export default function FunnelBuilderClient() {
                                             </button>
                                           </div>
                                           
-                                          {/* Swatches (Scalev Image 3 match) */}
+                                          {/* Swatches (Color Mode) */}
                                           {bgMode === 'warna' && (
                                             <div className="flex items-center gap-2.5 pt-2">
                                               {[
@@ -724,21 +757,71 @@ export default function FunnelBuilderClient() {
                                                 ></div>
                                               ))}
 
-                                              {/* Rainbow Custom Color Input */}
                                               <label className="w-8 h-8 rounded-full bg-gradient-to-tr from-rose-500 via-amber-400 to-indigo-500 border-2 border-white/40 cursor-pointer flex items-center justify-center shadow-md hover:scale-110 transition-transform">
                                                 <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="opacity-0 w-0 h-0" />
                                               </label>
+                                            </div>
+                                          )}
+
+                                          {/* Interactive Upload Gambar Latar Feature */}
+                                          {bgMode === 'gambar' && (
+                                            <div className="space-y-4 pt-2 animate-in fade-in">
+                                              <input 
+                                                type="file" 
+                                                ref={fileInputRef} 
+                                                onChange={handleBgImageFileUpload} 
+                                                accept="image/*" 
+                                                className="hidden" 
+                                              />
+                                              
+                                              <div 
+                                                onClick={() => fileInputRef.current?.click()}
+                                                className="p-6 border-2 border-dashed border-white/20 hover:border-amber-500/60 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer hover:bg-amber-500/5 transition-all group"
+                                              >
+                                                <Upload size={24} className="text-amber-400 mb-2 group-hover:scale-110 transition-transform" />
+                                                <h5 className="text-xs font-bold text-white">Klik untuk Upload Gambar Latar</h5>
+                                                <p className="text-[10px] text-slate-500 mt-1">File .jpg, .png, .webp (Maks 5MB)</p>
+                                              </div>
+
+                                              {/* Background URL input fallback */}
+                                              <div className="space-y-1.5">
+                                                <label className="text-[11px] text-slate-400 block">Atau Tempel URL Gambar Latar</label>
+                                                <input 
+                                                  type="text" 
+                                                  value={sectionBgImage} 
+                                                  onChange={(e) => setSectionBgImage(e.target.value)}
+                                                  placeholder="https://images.unsplash.com/..."
+                                                  className="w-full bg-[#161618] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                                                />
+                                              </div>
+
+                                              {/* Background Image Preview & Overlay Opacity slider */}
+                                              {sectionBgImage && (
+                                                <div className="space-y-3 p-3 bg-[#161618] rounded-xl border border-white/10">
+                                                  <div className="flex items-center justify-between">
+                                                    <span className="text-[11px] font-bold text-amber-400">Dark Tint Overlay: {bgImageOverlay}%</span>
+                                                    <button onClick={() => setSectionBgImage('')} className="text-[11px] text-rose-400 hover:underline">Hapus Latar</button>
+                                                  </div>
+                                                  <input 
+                                                    type="range" 
+                                                    min="0" 
+                                                    max="90" 
+                                                    value={bgImageOverlay} 
+                                                    onChange={(e) => setBgImageOverlay(Number(e.target.value))}
+                                                    className="w-full accent-amber-500 cursor-pointer"
+                                                  />
+                                                </div>
+                                              )}
                                             </div>
                                           )}
                                         </div>
 
                                         <div className="w-full h-px bg-white/10"></div>
 
-                                        {/* Padding Responsive Controls (Scalev Image 3 match) */}
+                                        {/* Padding Responsive Controls */}
                                         <div className="space-y-4">
                                           <label className="text-xs font-bold text-slate-300 block">Padding</label>
                                           
-                                          {/* Device selector tabs */}
                                           <div className="grid grid-cols-3 gap-2">
                                             {(['desktop', 'tablet', 'mobile'] as const).map(d => (
                                               <button 
@@ -751,7 +834,6 @@ export default function FunnelBuilderClient() {
                                             ))}
                                           </div>
 
-                                          {/* 4 Padding Input Fields (Atas, Kanan, Bawah, Kiri) */}
                                           <div className="grid grid-cols-2 gap-3">
                                             <div>
                                               <label className="text-[11px] text-slate-400 block mb-1">Padding Atas</label>
@@ -826,11 +908,10 @@ export default function FunnelBuilderClient() {
                               )}
 
                               {/* ---------------------------------------------------- */}
-                              {/* 2. GAMBAR COMPONENT EDITOR (ADVANCED FEATURES) */}
+                              {/* 2. GAMBAR COMPONENT EDITOR */}
                               {/* ---------------------------------------------------- */}
                               {activeComponent === 'Gambar' && (
                                 <div className="space-y-6 animate-in fade-in">
-                                  {/* Current Image Preview & Zoom Control */}
                                   <div className="space-y-3">
                                     <div className="flex items-center justify-between">
                                       <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Preview & Kontrol Gambar</label>
@@ -852,7 +933,6 @@ export default function FunnelBuilderClient() {
                                         </div>
                                       )}
 
-                                      {/* Floating Control Toolbar on Hover */}
                                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-xs">
                                         <button 
                                           onClick={() => setHeroImageZoom(prev => Math.min(prev + 15, 200))}
@@ -888,13 +968,11 @@ export default function FunnelBuilderClient() {
                                     </div>
                                   </div>
 
-                                  {/* Advance Controls (Zoom / Replace / Delete) */}
                                   <div className="space-y-4 bg-[#161618] p-4 rounded-xl border border-white/10">
                                     <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
                                       <Settings size={14} className="text-amber-400" /> Fitur Advance Gambar
                                     </h4>
 
-                                    {/* Replace / URL Input */}
                                     <div className="space-y-2">
                                       <label className="text-xs text-slate-400 block">URL Gambar / Ganti Link</label>
                                       <input 
@@ -906,7 +984,6 @@ export default function FunnelBuilderClient() {
                                       />
                                     </div>
 
-                                    {/* Aspect Ratio / Object Fit */}
                                     <div className="space-y-2">
                                       <label className="text-xs text-slate-400 block">Mode Lay-out (Object Fit)</label>
                                       <div className="flex gap-2">
@@ -1233,7 +1310,7 @@ export default function FunnelBuilderClient() {
           {/* Canvas Area (Scrollable with explicit custom-scrollbar) */}
           <div className="flex-1 overflow-auto custom-scrollbar bg-slate-100 p-8 flex items-start justify-center relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
             
-            {/* The "Paper" / Mockup Container (Responsive per device) */}
+            {/* The "Paper" / Mockup Container (Clean Canvas - Default Navbar Removed as requested) */}
             <div 
               className={`shadow-2xl transition-all duration-300 relative origin-top overflow-hidden border border-slate-200 ${
                 device === 'desktop' ? 'w-full max-w-[1200px] rounded-xl' : 
@@ -1241,6 +1318,9 @@ export default function FunnelBuilderClient() {
               }`}
               style={{ 
                 backgroundColor: bgColor,
+                backgroundImage: sectionBgImage ? `url(${sectionBgImage})` : undefined,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
                 transform: `scale(${zoom / 100})`, 
                 minHeight: '1000px',
                 paddingTop: `${currentPadding.top}px`,
@@ -1249,29 +1329,22 @@ export default function FunnelBuilderClient() {
                 paddingLeft: `${currentPadding.left}px`,
               }}
             >
+              {/* Optional Dark Tint Overlay when background image is present */}
+              {sectionBgImage && (
+                <div 
+                  className="absolute inset-0 z-0 pointer-events-none transition-opacity" 
+                  style={{ backgroundColor: `rgba(0,0,0, ${bgImageOverlay / 100})` }}
+                ></div>
+              )}
+
               {/* Mockup Landing Page Content */}
-              <div className="font-sans text-slate-800 relative w-full h-full pb-20">
-                {/* Navbar */}
-                <nav className="flex justify-between items-center p-6 lg:px-12 bg-white/90 backdrop-blur sticky top-0 z-30 border-b border-slate-100">
-                  <div className="font-black text-2xl tracking-tighter text-slate-900">{brandName}<span className="text-rose-600">.</span></div>
-                  <div className="hidden md:flex gap-8 text-sm font-semibold text-slate-600">
-                    <span className="text-slate-900 cursor-pointer">Concept</span>
-                    <span className="cursor-pointer hover:text-slate-900 transition-colors">Facilities</span>
-                    <span className="cursor-pointer hover:text-slate-900 transition-colors">Location</span>
-                  </div>
-                  <button 
-                    onClick={() => selectSection('Tombol', 'cta-button')}
-                    className={`bg-gradient-to-r ${ctaBg} text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-lg transition-transform hover:scale-105`}
-                  >
-                    {ctaText}
-                  </button>
-                </nav>
+              <div className="font-sans text-slate-800 relative z-10 w-full h-full pb-20 pt-10">
 
                 {/* Hero Section */}
-                <div className="relative pt-16 pb-24 px-6 text-center">
+                <div className="relative pt-8 pb-20 px-6 text-center">
                   <div className="relative z-10 max-w-4xl mx-auto space-y-6">
                     
-                    {/* Badge Hero (Interactive Sync) */}
+                    {/* Badge Hero (Interactive Sync + contentEditable) */}
                     <div 
                       onClick={() => { selectSection('Teks', 'hero-badge'); setTextTarget('badge'); }}
                       onMouseEnter={() => setHoveredElementId('hero-badge')}
@@ -1281,18 +1354,23 @@ export default function FunnelBuilderClient() {
                         hoveredElementId === 'hero-badge' ? 'ring-2 ring-amber-400/60' : ''
                       }`}
                     >
-                      <span className="inline-block py-1.5 px-4 rounded-full bg-rose-100 text-rose-700 font-bold text-xs uppercase tracking-widest">
+                      <span 
+                        contentEditable={true}
+                        suppressContentEditableWarning={true}
+                        onBlur={(e) => setHeroBadge(e.currentTarget.innerText)}
+                        className="inline-block py-1.5 px-4 rounded-full bg-rose-100 text-rose-700 font-bold text-xs uppercase tracking-widest outline-none focus:ring-2 focus:ring-rose-500"
+                      >
                         {heroBadge}
                       </span>
 
                       {(activeElementId === 'hero-badge' || hoveredElementId === 'hero-badge') && (
-                        <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-[10px] font-bold px-2 py-0.5 rounded shadow whitespace-nowrap z-30">
+                        <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-[10px] font-bold px-2 py-0.5 rounded shadow whitespace-nowrap z-30 pointer-events-none">
                           {activeElementId === 'hero-badge' ? '⚡ Mengedit Badge' : '👁️ Hover Badge'}
                         </div>
                       )}
                     </div>
 
-                    {/* Headline Hero (Interactive Sync with live custom formatting) */}
+                    {/* Headline Hero (Direct contentEditable - User can highlight/block specific words live!) */}
                     <div 
                       onClick={() => { selectSection('Teks', 'hero-headline'); setTextTarget('headline'); }}
                       onMouseEnter={() => setHoveredElementId('hero-headline')}
@@ -1303,13 +1381,16 @@ export default function FunnelBuilderClient() {
                       }`}
                     >
                       <h1 
-                        className={`font-black text-slate-900 leading-tight ${isBold ? 'font-bold' : 'font-normal'} ${isItalic ? 'italic' : ''}`}
+                        contentEditable={true}
+                        suppressContentEditableWarning={true}
+                        onBlur={(e) => setHeroTitle(e.currentTarget.innerText)}
+                        className={`font-black text-slate-900 leading-tight outline-none focus:ring-1 focus:ring-amber-500/50 rounded-lg ${isBold ? 'font-bold' : 'font-normal'} ${isItalic ? 'italic' : ''}`}
                         style={{ 
                           fontFamily: fontFamily,
                           fontSize: headingType === 'Heading 1' ? '56px' : headingType === 'Heading 2' ? '40px' : headingType === 'Heading 3' ? '32px' : fontSizePx,
                           lineHeight: lineHeight,
                           textAlign: textAlign as any, 
-                          color: textColor,
+                          color: sectionBgImage ? '#ffffff' : textColor,
                           backgroundColor: textBgHighlight,
                           textDecoration: isUnderline && isStrikethrough ? 'underline line-through' : isUnderline ? 'underline' : isStrikethrough ? 'line-through' : 'none'
                         }}
@@ -1321,19 +1402,22 @@ export default function FunnelBuilderClient() {
                       </h1>
 
                       {(activeElementId === 'hero-headline' || hoveredElementId === 'hero-headline') && (
-                        <div className="absolute -top-4 right-4 bg-amber-500 text-black text-[11px] font-bold px-3 py-1 shadow-lg flex items-center gap-1 rounded-full z-30 animate-pulse">
-                          <Type size={12} /> {activeElementId === 'hero-headline' ? 'Mengedit Headline' : 'Hover Headline'}
+                        <div className="absolute -top-4 right-4 bg-amber-500 text-black text-[11px] font-bold px-3 py-1 shadow-lg flex items-center gap-1 rounded-full z-30 animate-pulse pointer-events-none">
+                          <Type size={12} /> {activeElementId === 'hero-headline' ? 'Mengedit Headline (Bisa Blok Kata)' : 'Hover Headline'}
                         </div>
                       )}
                     </div>
 
-                    {/* Subtitle Hero (Interactive Sync with formatting & optional link) */}
+                    {/* Subtitle Hero (Direct contentEditable - User can highlight/block specific words live!) */}
                     <div 
                       onClick={() => { selectSection('Teks', 'hero-headline'); setTextTarget('subtitle'); }}
-                      className="cursor-pointer hover:opacity-80 transition-opacity max-w-2xl mx-auto"
+                      className="cursor-pointer hover:opacity-90 transition-opacity max-w-2xl mx-auto"
                     >
                       <p 
-                        className={`text-base md:text-xl text-slate-600 mb-10 ${isItalic ? 'italic' : ''}`}
+                        contentEditable={true}
+                        suppressContentEditableWarning={true}
+                        onBlur={(e) => setHeroSubtitle(e.currentTarget.innerText)}
+                        className={`text-base md:text-xl text-slate-600 mb-10 outline-none focus:ring-1 focus:ring-amber-500/50 rounded-lg p-2 ${isItalic ? 'italic' : ''} ${sectionBgImage ? 'text-slate-200' : ''}`}
                         style={{ 
                           fontFamily: fontFamily,
                           lineHeight: lineHeight,
@@ -1342,13 +1426,7 @@ export default function FunnelBuilderClient() {
                         }}
                       >
                         {isNumberedList ? '1. ' : isBulletList ? '• ' : ''}
-                        {textLinkUrl ? (
-                          <a href={textLinkUrl} target="_blank" rel="noreferrer" className="text-blue-600 underline font-semibold">
-                            {heroSubtitle}
-                          </a>
-                        ) : (
-                          heroSubtitle
-                        )}
+                        {heroSubtitle}
                       </p>
                     </div>
                     
@@ -1378,7 +1456,6 @@ export default function FunnelBuilderClient() {
                         </div>
                       )}
 
-                      {/* Play Button overlay mock */}
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                         <div className="w-20 h-20 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
                           <Play size={32} className="text-white fill-current ml-2" />
@@ -1386,7 +1463,7 @@ export default function FunnelBuilderClient() {
                       </div>
 
                       {(activeElementId === 'hero-image' || hoveredElementId === 'hero-image') && (
-                        <div className="absolute top-4 right-4 bg-amber-500 text-black text-[11px] font-bold px-3 py-1 shadow-lg flex items-center gap-1 rounded-full z-30">
+                        <div className="absolute top-4 right-4 bg-amber-500 text-black text-[11px] font-bold px-3 py-1 shadow-lg flex items-center gap-1 rounded-full z-30 pointer-events-none">
                           <ImageIcon size={12} /> {activeElementId === 'hero-image' ? 'Mengedit Gambar Hero' : 'Hover Gambar'}
                         </div>
                       )}
@@ -1423,7 +1500,7 @@ export default function FunnelBuilderClient() {
                   </div>
 
                   {(activeElementId === 'features-section' || hoveredElementId === 'features-section') && (
-                    <div className="absolute top-2 right-2 bg-amber-500 text-black text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow">
+                    <div className="absolute top-2 right-2 bg-amber-500 text-black text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow pointer-events-none">
                       Mengedit Features Section
                     </div>
                   )}
@@ -1449,7 +1526,7 @@ export default function FunnelBuilderClient() {
                     </div>
 
                     {activeElementId === 'video-section' && (
-                      <div className="absolute top-4 right-4 bg-amber-500 text-black text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow">
+                      <div className="absolute top-4 right-4 bg-amber-500 text-black text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow pointer-events-none">
                         Mengedit Section Video
                       </div>
                     )}
@@ -1476,7 +1553,7 @@ export default function FunnelBuilderClient() {
                   </div>
 
                   {activeElementId === 'form-section' && (
-                    <div className="absolute top-4 right-4 bg-amber-500 text-black text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow">
+                    <div className="absolute top-4 right-4 bg-amber-500 text-black text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow pointer-events-none">
                       Mengedit Form Pemesanan
                     </div>
                   )}
@@ -1506,7 +1583,7 @@ export default function FunnelBuilderClient() {
                   </div>
 
                   {activeElementId === 'testimonial-section' && (
-                    <div className="absolute top-2 right-2 bg-amber-500 text-black text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow">
+                    <div className="absolute top-2 right-2 bg-amber-500 text-black text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow pointer-events-none">
                       Mengedit Testimoni
                     </div>
                   )}
@@ -1530,7 +1607,7 @@ export default function FunnelBuilderClient() {
                   </div>
 
                   {activeElementId === 'faq-section' && (
-                    <div className="absolute top-2 right-2 bg-amber-500 text-black text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow">
+                    <div className="absolute top-2 right-2 bg-amber-500 text-black text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow pointer-events-none">
                       Mengedit FAQ
                     </div>
                   )}
