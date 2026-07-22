@@ -19,14 +19,18 @@ export async function generateCampaignLink(formData: FormData) {
     const campaignName = formData.get("campaign_name") as string;
     const cluster = formData.get("cluster") as string;
     const originalUrl = formData.get("original_url") as string || '/';
+    const metaPixelId = formData.get("meta_pixel_id") as string || null;
+    const tiktokPixelId = formData.get("tiktok_pixel_id") as string || null;
 
-    const payload = {
+    const payload: any = {
       short_code: shortCode,
       sales_name: salesName,
       platform: platform,
       campaign_name: campaignName,
       cluster: cluster,
       original_url: originalUrl,
+      meta_pixel_id: metaPixelId,
+      tiktok_pixel_id: tiktokPixelId,
       total_clicks: 0
     };
 
@@ -34,7 +38,11 @@ export async function generateCampaignLink(formData: FormData) {
 
     if (error) {
       console.error("Gagal membuat campaign link:", error);
-      return { success: false, error: error.message };
+      delete payload.meta_pixel_id;
+      delete payload.tiktok_pixel_id;
+      const fallback = await supabase.from('campaign_links').insert([payload]).select();
+      if (fallback.error) return { success: false, error: fallback.error.message };
+      return { success: true, data: fallback.data[0] };
     }
 
     return { success: true, data: data[0] };

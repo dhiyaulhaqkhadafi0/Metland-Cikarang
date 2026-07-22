@@ -117,11 +117,22 @@ export default function NewLeadPage() {
                     name="project"
                     value={formData.project}
                     onChange={handleChange}
-                    className="flex h-11 w-full rounded-xl border border-white/20 bg-white/10 backdrop-blur-md px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 transition-all appearance-none"
+                    className="flex h-11 w-full rounded-xl border border-white/20 bg-white/10 backdrop-blur-md px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 transition-all"
                     required
                   >
-                    <option value="brassia_garden" className="bg-[#0B0F14]">Brassia Garden (Residensial)</option>
-                    <option value="weston_gateway" className="bg-[#0B0F14]">Weston Gateway (Komersial)</option>
+                    <optgroup label="Cluster Avesa Garden" className="bg-[#0B0F14] text-emerald-400 font-bold">
+                      <option value="canary" className="bg-[#0B0F14] text-white">Canary (Sub-cluster Avesa)</option>
+                      <option value="derora" className="bg-[#0B0F14] text-white">Derora (Sub-cluster Avesa)</option>
+                    </optgroup>
+                    <optgroup label="Cluster Brassia Garden" className="bg-[#0B0F14] text-emerald-400 font-bold">
+                      <option value="myzora" className="bg-[#0B0F14] text-white">Myzora (Sub-cluster Brassia)</option>
+                      <option value="ellyra" className="bg-[#0B0F14] text-white">Ellyra (Sub-cluster Brassia)</option>
+                      <option value="brassia_garden" className="bg-[#0B0F14] text-white">Brassia Garden (General)</option>
+                    </optgroup>
+                    <optgroup label="Komersial & Ruko" className="bg-[#0B0F14] text-emerald-400 font-bold">
+                      <option value="ruko_easton" className="bg-[#0B0F14] text-white">Ruko Easton (Komersial)</option>
+                      <option value="weston_gateway" className="bg-[#0B0F14] text-white">Weston Gateway (Komersial)</option>
+                    </optgroup>
                   </select>
                 </div>
                 <div className="space-y-1.5 w-full">
