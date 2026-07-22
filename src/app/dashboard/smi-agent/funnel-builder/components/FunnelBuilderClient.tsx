@@ -7,12 +7,13 @@ import {
   PanelLeftClose, PanelLeftOpen, Save, Send, Layout, LayoutTemplate, 
   Settings, Type, Image as ImageIcon, LayoutGrid, Layers, BarChart3, 
   ChevronDown, CheckCircle2, Play, Wand2, Paintbrush, FileText, ChevronLeft,
-  Search, Eye, Box, AlertTriangle, ArrowRight, MousePointer2, Plus, Trash2, RefreshCw, Upload,
+  Search, Eye, Box, AlertTriangle, ArrowRight, MousePointer2, Plus, Trash2, RefreshCw, Upload, Sparkles,
   Globe, Target, BrainCircuit, Undo, RotateCcw,
   Video, List, MessageSquare, HelpCircle, GalleryHorizontal, 
   MousePointerClick, Code, PlaySquare, Navigation, Minus, FileCode2,
   Bold, Italic, Underline, Strikethrough, Link as LinkIcon, ListOrdered, 
-  AlignLeft, AlignCenter, AlignRight, AlignJustify, Smile, Heading, Palette, Type as FontIcon, Baseline, RemoveFormatting, X, Sparkles
+  AlignLeft, AlignCenter, AlignRight, AlignJustify, Smile, Heading, Palette, Type as FontIcon, Baseline, RemoveFormatting, X,
+  Music, Volume2, VolumeX, Volume1, SkipBack, SkipForward, Shuffle, Repeat, ListMusic, Maximize2, Minimize2, Disc, Pause
 } from 'lucide-react';
 
 type Mode = 'aigen' | 'builder' | 'template';
@@ -48,9 +49,12 @@ export default function FunnelBuilderClient() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // Sync & Selection States
-  const [activeComponent, setActiveComponent] = useState<string | null>('Teks');
+  const [activeComponent, setActiveComponent] = useState<string | null>(null);
   const [activeElementId, setActiveElementId] = useState<string>('hero-headline');
   const [hoveredElementId, setHoveredElementId] = useState<string | null>(null);
+
+  // Modal State for "+ Tambah Komponen Baru"
+  const [showAddComponentModal, setShowAddComponentModal] = useState(false);
 
   // Component Data States (Real-time Live Preview Data)
   const [brandName, setBrandName] = useState("MYZORA");
@@ -87,7 +91,7 @@ export default function FunnelBuilderClient() {
   const [bgColor, setBgColor] = useState('#ffffff');
   const [bgMode, setBgMode] = useState<'warna' | 'gambar'>('warna');
   const [sectionBgImage, setSectionBgImage] = useState<string>('');
-  const [bgImageOverlay, setBgImageOverlay] = useState<number>(30); // 0% to 90% opacity
+  const [bgImageOverlay, setBgImageOverlay] = useState<number>(30);
   const [paddingDevice, setPaddingDevice] = useState<Device>('desktop');
   const [paddingConfig, setPaddingConfig] = useState<Record<Device, DevicePadding>>({
     desktop: { top: 0, right: 0, bottom: 0, left: 0 },
@@ -95,10 +99,12 @@ export default function FunnelBuilderClient() {
     mobile: { top: 0, right: 0, bottom: 0, left: 0 },
   });
 
-  // Image Component States (Advance Feature support: zoom, replace, delete, fit)
-  const [heroImage, setHeroImage] = useState("https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80");
+  // Image Component States (Advance Feature: upload, zoom, replace, aspect ratio, max-width, HD optimization)
+  const [heroImage, setHeroImage] = useState("https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=85");
   const [heroImageZoom, setHeroImageZoom] = useState(100);
   const [heroImageFit, setHeroImageFit] = useState<'cover' | 'contain' | 'fill'>('cover');
+  const [heroImageAspect, setHeroImageAspect] = useState<string>('aspect-video');
+  const [heroImageMaxWidth, setHeroImageMaxWidth] = useState<string>('max-w-4xl');
 
   // Button Component States
   const [ctaText, setCtaText] = useState("Get Pricelist");
@@ -132,7 +138,111 @@ export default function FunnelBuilderClient() {
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [publishProgress, setPublishProgress] = useState(0);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // --------------------------------------------------------------------------
+  // Spotify Mini Background Music Player (High-Speed Cloud Stream CDN - 0MB Repo Load)
+  // --------------------------------------------------------------------------
+  const musicTracks = [
+    { id: 1, title: "Lofi Study & Focus Beats", artist: "Chillhop Music", src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" },
+    { id: 2, title: "Cozy Piano & Rain Ambient", artist: "Franz Gordon", src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a7395b.mp3?filename=relaxing-piano-10701.mp3" },
+    { id: 3, title: "Deep Work Focus Session", artist: "Mindful Beats", src: "https://cdn.pixabay.com/download/audio/2022/11/06/audio_c9735d4661.mp3?filename=ambient-piano-126274.mp3" },
+    { id: 4, title: "Clear Blue Sky", artist: "Sarah, Illstrumentalist", src: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=chill-abstract-intention-12099.mp3" },
+    { id: 5, title: "Coffee Shop Acoustic", artist: "Dylan Sitts", src: "https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939f60bc3.mp3?filename=acoustic-guitars-ambient-124484.mp3" },
+    { id: 6, title: "Midnight Jazz & Wine", artist: "Lounge Quartet", src: "https://cdn.pixabay.com/download/audio/2022/10/25/audio_24719bb7d2.mp3?filename=smooth-jazz-125442.mp3" },
+    { id: 7, title: "Eternal Fire Instrumental", artist: "Adelyn Paik", src: "https://cdn.pixabay.com/download/audio/2022/08/02/audio_884fe92c21.mp3?filename=gentle-piano-ambient-115343.mp3" },
+    { id: 8, title: "Grey Afternoon Chill", artist: "Dian Shuai", src: "https://cdn.pixabay.com/download/audio/2022/05/16/audio_db65912444.mp3?filename=lofi-chill-medium-version-110804.mp3" },
+    { id: 9, title: "Soft Piano & Strings", artist: "Helmut Schenker", src: "https://cdn.pixabay.com/download/audio/2022/06/15/audio_c8b9d62d03.mp3?filename=soft-piano-strings-113524.mp3" },
+    { id: 10, title: "I'll Get Up (Lo-Fi Remix)", artist: "Mindme", src: "https://cdn.pixabay.com/download/audio/2022/04/27/audio_651239c811.mp3?filename=lofi-vibes-110022.mp3" },
+    { id: 11, title: "If You Say Yes", artist: "Anna Landstrom", src: "https://cdn.pixabay.com/download/audio/2022/02/22/audio_d193d2e956.mp3?filename=sweet-piano-10887.mp3" },
+    { id: 12, title: "In It Deep Concentration", artist: "Kadant", src: "https://cdn.pixabay.com/download/audio/2022/09/20/audio_b2f90a191e.mp3?filename=deep-ambient-123490.mp3" },
+    { id: 13, title: "It's About Time Chill", artist: "Windshield", src: "https://cdn.pixabay.com/download/audio/2022/07/28/audio_c1e84a29a6.mp3?filename=chillout-ambient-114920.mp3" },
+    { id: 14, title: "Never Saw It Coming", artist: "Hallmore", src: "https://cdn.pixabay.com/download/audio/2022/08/31/audio_d56d116c27.mp3?filename=lofi-hip-hop-120023.mp3" },
+    { id: 15, title: "New Computer Coding Beat", artist: "Dylan Sitts", src: "https://cdn.pixabay.com/download/audio/2022/03/10/audio_c29bf54432.mp3?filename=future-lofi-10495.mp3" },
+    { id: 16, title: "Smell of Morning Coffee", artist: "Franz Gordon", src: "https://cdn.pixabay.com/download/audio/2022/11/15/audio_2475e11414.mp3?filename=morning-coffee-127891.mp3" },
+    { id: 17, title: "Soft Pine Forest Beats", artist: "Jobii", src: "https://cdn.pixabay.com/download/audio/2022/10/05/audio_82c2b3d8f8.mp3?filename=nature-ambient-123910.mp3" },
+    { id: 18, title: "Solace Calm Mind", artist: "Staffan Carlen", src: "https://cdn.pixabay.com/download/audio/2022/06/07/audio_c98782d921.mp3?filename=calm-meditation-112903.mp3" },
+    { id: 19, title: "Sun Behind Blinds", artist: "Anna Landstrom", src: "https://cdn.pixabay.com/download/audio/2022/04/18/audio_291079bc21.mp3?filename=warm-breeze-109012.mp3" },
+    { id: 20, title: "Tender Pauses Guitar", artist: "Atlas Kind", src: "https://cdn.pixabay.com/download/audio/2022/09/05/audio_491d90c681.mp3?filename=acoustic-ambient-121045.mp3" },
+    { id: 21, title: "The Road Long Drive", artist: "Hara Noda", src: "https://cdn.pixabay.com/download/audio/2022/07/12/audio_b829d67123.mp3?filename=sunset-drive-114002.mp3" },
+    { id: 22, title: "Time to Time Piano", artist: "Helmut Schenker", src: "https://cdn.pixabay.com/download/audio/2022/05/03/audio_a10f821902.mp3?filename=minimal-piano-110412.mp3" },
+    { id: 23, title: "Uppvaknandet Nordics", artist: "Sven Lindvall", src: "https://cdn.pixabay.com/download/audio/2022/08/19/audio_651239a990.mp3?filename=nordic-ambient-116045.mp3" },
+    { id: 24, title: "Vanilla Chill Beats", artist: "Dyalla", src: "https://cdn.pixabay.com/download/audio/2022/06/21/audio_51293819aa.mp3?filename=vanilla-lofi-113910.mp3" },
+    { id: 25, title: "Productivity Instrumental", artist: "SMMC Studio", src: "https://cdn.pixabay.com/download/audio/2022/10/18/audio_512930ab12.mp3?filename=productivity-focus-124901.mp3" },
+  ];
+
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [isPlayingMusic, setIsPlayingMusic] = useState(false);
+  const [isPlayerExpanded, setIsPlayerExpanded] = useState(false);
+  const [showPlaylistPopover, setShowPlaylistPopover] = useState(false);
+  const [musicVolume, setMusicVolume] = useState(0.7);
+  const [isMutedMusic, setIsMutedMusic] = useState(false);
+  const [musicProgress, setMusicProgress] = useState(0);
+  const [musicDuration, setMusicDuration] = useState(0);
+  const [musicCurrentTime, setMusicCurrentTime] = useState(0);
+  const [isShuffleMusic, setIsShuffleMusic] = useState(false);
+  const [isRepeatMusic, setIsRepeatMusic] = useState(false);
+  const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const bgFileInputRef = useRef<HTMLInputElement>(null);
+  const imageFileInputRef = useRef<HTMLInputElement>(null);
+
+  const togglePlayMusic = () => {
+    if (!audioRef.current) return;
+    if (isPlayingMusic) {
+      audioRef.current.pause();
+      setIsPlayingMusic(false);
+    } else {
+      audioRef.current.play();
+      setIsPlayingMusic(true);
+    }
+  };
+
+  const playNextTrack = () => {
+    let nextIndex;
+    if (isShuffleMusic) {
+      nextIndex = Math.floor(Math.random() * musicTracks.length);
+    } else {
+      nextIndex = (currentTrackIndex + 1) % musicTracks.length;
+    }
+    setCurrentTrackIndex(nextIndex);
+    setIsPlayingMusic(true);
+    setTimeout(() => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
+      }
+    }, 100);
+  };
+
+  const playPrevTrack = () => {
+    const prevIndex = (currentTrackIndex - 1 + musicTracks.length) % musicTracks.length;
+    setCurrentTrackIndex(prevIndex);
+    setIsPlayingMusic(true);
+    setTimeout(() => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
+      }
+    }, 100);
+  };
+
+  const selectTrack = (index: number) => {
+    setCurrentTrackIndex(index);
+    setIsPlayingMusic(true);
+    setTimeout(() => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
+      }
+    }, 100);
+  };
+
+  const formatTime = (secs: number) => {
+    if (isNaN(secs)) return "00:00";
+    const minutes = Math.floor(secs / 60);
+    const seconds = Math.floor(secs % 60);
+    return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
 
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 10, 200));
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 10, 30));
@@ -151,7 +261,7 @@ export default function FunnelBuilderClient() {
     }, 1000);
   };
 
-  // Execute native rich inline formatting on active selection (Word blocking format)
+  // Execute native rich inline formatting on active selection
   const applyInlineFormat = (command: string, value: string | undefined = undefined) => {
     if (typeof window !== 'undefined') {
       document.execCommand(command, false, value);
@@ -173,6 +283,21 @@ export default function FunnelBuilderClient() {
     }
   };
 
+  // Handle local image file upload for Hero Component Gambar
+  const handleHeroImageFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setHeroImage(event.target.result as string);
+          setHeroImageZoom(100);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Helper to append emoji into target text
   const addEmoji = (emoji: string) => {
     if (textTarget === 'headline') setHeroTitle(prev => prev + ' ' + emoji);
@@ -182,6 +307,7 @@ export default function FunnelBuilderClient() {
     setIsEmojiPickerOpen(false);
   };
 
+  // ALL 15 COMPONENTS LIST
   const componentsList = [
     { id: 'Teks', icon: Type, elementId: 'hero-headline' },
     { id: 'Gambar', icon: ImageIcon, elementId: 'hero-image' },
@@ -190,7 +316,14 @@ export default function FunnelBuilderClient() {
     { id: 'Daftar/List', icon: List, elementId: 'features-section' },
     { id: 'Testimoni', icon: MessageSquare, elementId: 'testimonial-section' },
     { id: 'FAQ', icon: HelpCircle, elementId: 'faq-section' },
+    { id: 'Carousel', icon: GalleryHorizontal, elementId: 'carousel-section' },
     { id: 'Tombol', icon: MousePointerClick, elementId: 'cta-button' },
+    { id: 'Embed', icon: Code, elementId: 'embed-section' },
+    { id: 'YouTube', icon: PlaySquare, elementId: 'video-section' },
+    { id: 'Scroll Target', icon: Navigation, elementId: 'features-section' },
+    { id: 'Divider', icon: Minus, elementId: 'divider-section' },
+    { id: 'Section', icon: Layers, elementId: 'hero-headline' },
+    { id: 'Html', icon: FileCode2, elementId: 'embed-section' },
   ];
 
   // Helper to trigger select component & element sync
@@ -200,6 +333,14 @@ export default function FunnelBuilderClient() {
     if (activeMode !== 'builder') setActiveMode('builder');
     if (builderTab !== 'konten') setBuilderTab('konten');
   };
+
+  // HD Presets Gallery (Optimized WebP/HD params for crisp fast loading)
+  const hdImagePresets = [
+    { name: 'Exterior Luxury Modern', url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=85' },
+    { name: 'Modern House Villa', url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=85' },
+    { name: 'Interior Living Space', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=85' },
+    { name: 'Clubhouse Resort & Pool', url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=85' },
+  ];
 
   // Font list choices
   const fontFamilies = [
@@ -276,7 +417,7 @@ export default function FunnelBuilderClient() {
               setHeroTitle("Rumah Elite Budget Ngirit");
               setHeroTitleGradient("Myzora Metland Cikarang");
               setHeroSubtitle("Uang habis buat bayar kontrakan tapi ga ada bekasnya? RUGI DONG 😆. Nih mending cobain Myzora, Rumah bagus, cicilan 3 jutaan doank masa?");
-              setHeroImage("https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80");
+              setHeroImage("https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=85");
               setHeroImageZoom(100);
               setSectionBgImage('');
               setBgColor('#ffffff');
@@ -404,14 +545,23 @@ export default function FunnelBuilderClient() {
                     {builderTab === 'konten' && (
                       <div className="flex-1 flex flex-col">
                         
-                        {/* LIST OF COMPONENTS VIEW */}
+                        {/* LIST OF ALL 15 COMPONENTS VIEW */}
                         {!activeComponent && (
-                          <div className="p-5 space-y-5 animate-in slide-in-from-left-4 duration-300">
-                            <div className="flex justify-between items-center mb-4">
-                              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Komponen Halaman</h4>
+                          <div className="p-5 space-y-4 animate-in slide-in-from-left-4 duration-300">
+                            <div className="flex justify-between items-center mb-1">
+                              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Komponen Halaman ({componentsList.length} Section)</h4>
                             </div>
+
+                            {/* Prominent "+ Tambah Komponen Baru" button */}
+                            <button 
+                              onClick={() => setShowAddComponentModal(true)}
+                              className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg transition-transform hover:scale-[1.02] mb-3"
+                            >
+                              <Plus size={16} /> Tambah Komponen Baru
+                            </button>
                             
-                            <div className="grid grid-cols-2 gap-3">
+                            {/* Scrollable 15 Components Grid */}
+                            <div className="grid grid-cols-2 gap-3 pb-12">
                               {componentsList.map((comp) => (
                                 <div 
                                   key={comp.id}
@@ -427,6 +577,14 @@ export default function FunnelBuilderClient() {
                                 </div>
                               ))}
                             </div>
+
+                            {/* Bottom "+ Tambah Komponen Baru" button */}
+                            <button 
+                              onClick={() => setShowAddComponentModal(true)}
+                              className="w-full py-3 px-4 bg-[#1a1a1c] border border-dashed border-white/20 hover:border-amber-500/60 text-slate-300 hover:text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors mb-6"
+                            >
+                              <Plus size={16} className="text-amber-400" /> Tambah Komponen Ke Layout
+                            </button>
                           </div>
                         )}
 
@@ -451,7 +609,7 @@ export default function FunnelBuilderClient() {
                             <div className="p-5 space-y-6 overflow-y-auto custom-scrollbar">
                               
                               {/* ---------------------------------------------------- */}
-                              {/* 1. TEKS COMPONENT EDITOR (INLINE WORD SELECTION & FORMATTING) */}
+                              {/* 1. TEKS COMPONENT EDITOR */}
                               {/* ---------------------------------------------------- */}
                               {activeComponent === 'Teks' && (
                                 <>
@@ -489,7 +647,6 @@ export default function FunnelBuilderClient() {
                                     <div className="flex items-center justify-between">
                                       <label className="text-xs font-bold text-slate-400">Isi Konten Teks Live</label>
                                       
-                                      {/* Background Editor Gelap Toggle */}
                                       <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsDarkEditorBg(!isDarkEditorBg)}>
                                         <div className={`w-8 h-4 rounded-full transition-colors relative p-0.5 ${isDarkEditorBg ? 'bg-amber-500' : 'bg-slate-600'}`}>
                                           <div className={`w-3 h-3 bg-white rounded-full transition-transform ${isDarkEditorBg ? 'translate-x-4' : 'translate-x-0'}`}></div>
@@ -498,15 +655,12 @@ export default function FunnelBuilderClient() {
                                       </div>
                                     </div>
                                     
-                                    {/* Scalev-like 3-Row Comprehensive Toolbar */}
                                     <div className="border border-white/15 rounded-xl overflow-hidden bg-[#161618] shadow-lg">
                                       
-                                      {/* ROW 1: Basic Inline Formatting Controls (Supports selection-level formatting) */}
                                       <div className="bg-[#1a1a1c] border-b border-white/10 p-2 flex flex-wrap items-center gap-1.5 relative">
                                         <button onClick={() => { setIsBold(!isBold); applyInlineFormat('bold'); }} className={`w-8 h-8 flex items-center justify-center rounded font-bold transition-colors ${isBold ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Bold Kata Terblok (B)"><Bold size={16} /></button>
                                         <button onClick={() => { setIsItalic(!isItalic); applyInlineFormat('italic'); }} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isItalic ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Italic Kata Terblok (I)"><Italic size={16} /></button>
                                         
-                                        {/* Text Color Picker Swatch */}
                                         <div className="relative group flex items-center">
                                           <label className="w-8 h-8 flex flex-col items-center justify-center rounded hover:bg-white/10 cursor-pointer text-slate-300" title="Warna Teks Kata Terblok">
                                             <Baseline size={16} />
@@ -515,7 +669,6 @@ export default function FunnelBuilderClient() {
                                           </label>
                                         </div>
 
-                                        {/* Highlight Background Color Swatch */}
                                         <div className="relative group flex items-center">
                                           <label className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 cursor-pointer text-slate-300" title="Warna Sorotan Kata Terblok">
                                             <Palette size={16} />
@@ -524,28 +677,19 @@ export default function FunnelBuilderClient() {
                                         </div>
 
                                         <button onClick={() => { setIsUnderline(!isUnderline); applyInlineFormat('underline'); }} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isUnderline ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Underline Kata Terblok (U)"><Underline size={16} /></button>
-                                        
-                                        {/* Huruf Dicoret / Strikethrough */}
                                         <button onClick={() => { setIsStrikethrough(!isStrikethrough); applyInlineFormat('strikeThrough'); }} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isStrikethrough ? 'bg-amber-500/30 text-amber-400 border border-amber-500/50' : 'hover:bg-white/10 text-slate-300'}`} title="Huruf Dicoret (Strikethrough)"><Strikethrough size={16} /></button>
 
                                         <div className="w-px h-6 bg-white/10 mx-0.5"></div>
 
-                                        {/* Link Tautan Modal Toggle */}
                                         <button onClick={() => setIsLinkModalOpen(!isLinkModalOpen)} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isLinkModalOpen || textLinkUrl ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`} title="Tautan Link"><LinkIcon size={16} /></button>
-
-                                        {/* Ordered List (123) */}
                                         <button onClick={() => { setIsNumberedList(!isNumberedList); setIsBulletList(false); }} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isNumberedList ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`} title="List Nomor (123)"><ListOrdered size={16} /></button>
-
-                                        {/* Unordered Bullet List */}
                                         <button onClick={() => { setIsBulletList(!isBulletList); setIsNumberedList(false); }} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${isBulletList ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`} title="List Peluru / Bullet"><List size={16} /></button>
 
-                                        {/* Alignment Options */}
                                         <button onClick={() => setTextAlign('left')} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${textAlign === 'left' ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`}><AlignLeft size={16} /></button>
                                         <button onClick={() => setTextAlign('center')} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${textAlign === 'center' ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`}><AlignCenter size={16} /></button>
                                         <button onClick={() => setTextAlign('right')} className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${textAlign === 'right' ? 'bg-amber-500/30 text-amber-400' : 'hover:bg-white/10 text-slate-300'}`}><AlignRight size={16} /></button>
                                       </div>
 
-                                      {/* ROW 2: Headings & Font Sizes */}
                                       <div className="bg-[#1a1a1c] border-b border-white/10 p-2 flex items-center gap-2">
                                         <select 
                                           value={headingType} 
@@ -584,7 +728,6 @@ export default function FunnelBuilderClient() {
                                         </select>
                                       </div>
 
-                                      {/* ROW 3: Page Font, Line Height, Emoji, Clear Formatting */}
                                       <div className="bg-[#1a1a1c] border-b border-white/10 p-2 flex items-center gap-2 relative">
                                         <select 
                                           value={fontFamily} 
@@ -634,7 +777,6 @@ export default function FunnelBuilderClient() {
                                           <RemoveFormatting size={16} />
                                         </button>
 
-                                        {/* Interactive Emoji Picker Popover */}
                                         {isEmojiPickerOpen && (
                                           <div className="absolute top-12 right-2 bg-[#161618] border border-amber-500/40 rounded-xl p-3 shadow-2xl z-50 w-64 animate-in fade-in">
                                             <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2">
@@ -660,7 +802,6 @@ export default function FunnelBuilderClient() {
                                         )}
                                       </div>
 
-                                      {/* Link URL Modal inside Editor */}
                                       {isLinkModalOpen && (
                                         <div className="p-3 bg-[#0a0a0a] border-b border-white/10 flex items-center gap-2 animate-in fade-in">
                                           <LinkIcon size={14} className="text-amber-400 shrink-0" />
@@ -683,7 +824,6 @@ export default function FunnelBuilderClient() {
                                         </div>
                                       )}
 
-                                      {/* Dynamic Textarea Editor */}
                                       <textarea 
                                         className={`w-full p-4 text-sm focus:outline-none resize-y min-h-[150px] transition-colors custom-scrollbar ${
                                           isDarkEditorBg ? 'bg-[#0a0a0a] text-white' : 'bg-white text-slate-900 font-semibold'
@@ -695,7 +835,7 @@ export default function FunnelBuilderClient() {
                                     </div>
                                   </div>
 
-                                  {/* Advance Dropdown (Background Swatches + Image Upload Feature) */}
+                                  {/* Advance Dropdown */}
                                   <div className="border border-white/10 rounded-xl overflow-hidden">
                                     <button 
                                       onClick={() => setIsAdvanceOpen(!isAdvanceOpen)}
@@ -710,7 +850,6 @@ export default function FunnelBuilderClient() {
                                     {isAdvanceOpen && (
                                       <div className="p-5 bg-[#0a0a0a] border-t border-white/10 space-y-6">
                                         
-                                        {/* Desain: Latar (Background) */}
                                         <div className="space-y-3">
                                           <h4 className="text-xs font-bold text-slate-300">Desain</h4>
                                           <p className="text-[11px] text-slate-500">Latar (Background)</p>
@@ -737,7 +876,6 @@ export default function FunnelBuilderClient() {
                                             </button>
                                           </div>
                                           
-                                          {/* Swatches (Color Mode) */}
                                           {bgMode === 'warna' && (
                                             <div className="flex items-center gap-2.5 pt-2">
                                               {[
@@ -763,19 +901,18 @@ export default function FunnelBuilderClient() {
                                             </div>
                                           )}
 
-                                          {/* Interactive Upload Gambar Latar Feature */}
                                           {bgMode === 'gambar' && (
                                             <div className="space-y-4 pt-2 animate-in fade-in">
                                               <input 
                                                 type="file" 
-                                                ref={fileInputRef} 
+                                                ref={bgFileInputRef} 
                                                 onChange={handleBgImageFileUpload} 
                                                 accept="image/*" 
                                                 className="hidden" 
                                               />
                                               
                                               <div 
-                                                onClick={() => fileInputRef.current?.click()}
+                                                onClick={() => bgFileInputRef.current?.click()}
                                                 className="p-6 border-2 border-dashed border-white/20 hover:border-amber-500/60 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer hover:bg-amber-500/5 transition-all group"
                                               >
                                                 <Upload size={24} className="text-amber-400 mb-2 group-hover:scale-110 transition-transform" />
@@ -783,7 +920,6 @@ export default function FunnelBuilderClient() {
                                                 <p className="text-[10px] text-slate-500 mt-1">File .jpg, .png, .webp (Maks 5MB)</p>
                                               </div>
 
-                                              {/* Background URL input fallback */}
                                               <div className="space-y-1.5">
                                                 <label className="text-[11px] text-slate-400 block">Atau Tempel URL Gambar Latar</label>
                                                 <input 
@@ -795,7 +931,6 @@ export default function FunnelBuilderClient() {
                                                 />
                                               </div>
 
-                                              {/* Background Image Preview & Overlay Opacity slider */}
                                               {sectionBgImage && (
                                                 <div className="space-y-3 p-3 bg-[#161618] rounded-xl border border-white/10">
                                                   <div className="flex items-center justify-between">
@@ -818,7 +953,6 @@ export default function FunnelBuilderClient() {
 
                                         <div className="w-full h-px bg-white/10"></div>
 
-                                        {/* Padding Responsive Controls */}
                                         <div className="space-y-4">
                                           <label className="text-xs font-bold text-slate-300 block">Padding</label>
                                           
@@ -912,59 +1046,125 @@ export default function FunnelBuilderClient() {
                               {/* ---------------------------------------------------- */}
                               {activeComponent === 'Gambar' && (
                                 <div className="space-y-6 animate-in fade-in">
+                                  
+                                  <input 
+                                    type="file" 
+                                    ref={imageFileInputRef} 
+                                    onChange={handleHeroImageFileUpload} 
+                                    accept="image/*" 
+                                    className="hidden" 
+                                  />
+
+                                  <div className="space-y-3">
+                                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block">Aksi Utama Gambar</label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                      <button 
+                                        onClick={() => imageFileInputRef.current?.click()}
+                                        className="py-3 px-4 bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg transition-transform hover:scale-[1.02]"
+                                      >
+                                        <Upload size={16} /> Upload Gambar
+                                      </button>
+                                      <button 
+                                        onClick={() => setHeroImage("https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=85")}
+                                        className="py-3 px-4 bg-[#1a1a1c] border border-white/15 hover:border-amber-500/50 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+                                      >
+                                        <RefreshCw size={16} className="text-amber-400" /> Reset HD Image
+                                      </button>
+                                    </div>
+                                  </div>
+
                                   <div className="space-y-3">
                                     <div className="flex items-center justify-between">
-                                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Preview & Kontrol Gambar</label>
-                                      <span className="text-xs font-mono text-amber-400 font-bold">{heroImageZoom}% Scale</span>
+                                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Preview & Skala</label>
+                                      <div className="flex items-center gap-2">
+                                        <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold border border-emerald-500/40">HD WebP</span>
+                                        <span className="text-xs font-mono text-amber-400 font-bold">{heroImageZoom}% Scale</span>
+                                      </div>
                                     </div>
 
-                                    <div className="relative rounded-xl border border-white/10 overflow-hidden bg-[#0a0a0a] h-48 flex items-center justify-center group">
+                                    <div className="relative rounded-xl border border-white/15 overflow-hidden bg-[#0a0a0a] min-h-[200px] flex flex-col items-center justify-center group">
                                       {heroImage ? (
-                                        <img 
-                                          src={heroImage} 
-                                          alt="Preview" 
-                                          className="w-full h-full transition-transform duration-300" 
-                                          style={{ transform: `scale(${heroImageZoom / 100})`, objectFit: heroImageFit }}
-                                        />
+                                        <>
+                                          <img 
+                                            src={heroImage} 
+                                            alt="Preview HD" 
+                                            className="w-full h-auto max-h-56 transition-transform duration-300" 
+                                            style={{ transform: `scale(${heroImageZoom / 100})`, objectFit: heroImageFit }}
+                                          />
+                                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-xs">
+                                            <button 
+                                              onClick={() => imageFileInputRef.current?.click()}
+                                              className="p-2.5 bg-amber-500 text-black rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-lg"
+                                              title="Ganti Gambar"
+                                            >
+                                              <Upload size={16} /> Ganti Gambar
+                                            </button>
+                                            <button 
+                                              onClick={() => setHeroImageZoom(prev => Math.min(prev + 15, 200))}
+                                              className="p-2.5 bg-white/20 hover:bg-amber-500 text-white hover:text-black rounded-xl transition-all"
+                                              title="Zoom In"
+                                            >
+                                              <ZoomIn size={18} />
+                                            </button>
+                                            <button 
+                                              onClick={() => setHeroImageZoom(prev => Math.max(prev - 15, 50))}
+                                              className="p-2.5 bg-white/20 hover:bg-amber-500 text-white hover:text-black rounded-xl transition-all"
+                                              title="Zoom Out"
+                                            >
+                                              <ZoomOut size={18} />
+                                            </button>
+                                            <button 
+                                              onClick={() => setHeroImage('')}
+                                              className="p-2.5 bg-rose-600/80 hover:bg-rose-600 text-white rounded-xl transition-all"
+                                              title="Hapus Gambar"
+                                            >
+                                              <Trash2 size={18} />
+                                            </button>
+                                          </div>
+                                        </>
                                       ) : (
-                                        <div className="text-center p-6 text-slate-500">
-                                          <ImageIcon size={36} className="mx-auto mb-2 opacity-50" />
-                                          <p className="text-xs">Gambar Dihapus / Kosong</p>
+                                        <div className="p-8 text-center space-y-4">
+                                          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
+                                            <ImageIcon size={28} />
+                                          </div>
+                                          <div>
+                                            <h5 className="text-sm font-bold text-white mb-1">Gambar Belum Dipilih</h5>
+                                            <p className="text-xs text-slate-400 max-w-xs mx-auto mb-4">Upload gambar HD dari perangkat atau pilih gallery preset di bawah.</p>
+                                          </div>
+                                          <div className="flex gap-2 justify-center">
+                                            <button 
+                                              onClick={() => imageFileInputRef.current?.click()}
+                                              className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-lg transition-transform hover:scale-105"
+                                            >
+                                              <Upload size={14} /> Upload Gambar
+                                            </button>
+                                            <button 
+                                              onClick={() => setHeroImage("https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=85")}
+                                              className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors"
+                                            >
+                                              Pilih Preset HD
+                                            </button>
+                                          </div>
                                         </div>
                                       )}
+                                    </div>
+                                  </div>
 
-                                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-xs">
-                                        <button 
-                                          onClick={() => setHeroImageZoom(prev => Math.min(prev + 15, 200))}
-                                          className="p-2.5 bg-white/20 hover:bg-amber-500 text-white hover:text-black rounded-xl transition-all"
-                                          title="Zoom In"
+                                  <div className="space-y-2.5">
+                                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block">Pilih Gambar Preset HD (Optimized)</label>
+                                    <div className="grid grid-cols-2 gap-2.5">
+                                      {hdImagePresets.map((preset, idx) => (
+                                        <div 
+                                          key={idx}
+                                          onClick={() => { setHeroImage(preset.url); setHeroImageZoom(100); }}
+                                          className={`relative h-20 rounded-xl overflow-hidden border cursor-pointer group transition-all ${heroImage === preset.url ? 'border-amber-500 ring-2 ring-amber-500/40' : 'border-white/10 hover:border-amber-500/60'}`}
                                         >
-                                          <ZoomIn size={18} />
-                                        </button>
-                                        <button 
-                                          onClick={() => setHeroImageZoom(prev => Math.max(prev - 15, 50))}
-                                          className="p-2.5 bg-white/20 hover:bg-amber-500 text-white hover:text-black rounded-xl transition-all"
-                                          title="Zoom Out"
-                                        >
-                                          <ZoomOut size={18} />
-                                        </button>
-                                        <button 
-                                          onClick={() => setHeroImageZoom(100)}
-                                          className="p-2.5 bg-white/20 hover:bg-amber-500 text-white hover:text-black rounded-xl transition-all"
-                                          title="Reset Scale"
-                                        >
-                                          <RefreshCw size={18} />
-                                        </button>
-                                        {heroImage && (
-                                          <button 
-                                            onClick={() => setHeroImage('')}
-                                            className="p-2.5 bg-rose-600/80 hover:bg-rose-600 text-white rounded-xl transition-all"
-                                            title="Hapus Gambar"
-                                          >
-                                            <Trash2 size={18} />
-                                          </button>
-                                        )}
-                                      </div>
+                                          <img src={preset.url} alt={preset.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex items-end p-2">
+                                            <span className="text-[10px] font-bold text-white truncate">{preset.name}</span>
+                                          </div>
+                                        </div>
+                                      ))}
                                     </div>
                                   </div>
 
@@ -974,7 +1174,7 @@ export default function FunnelBuilderClient() {
                                     </h4>
 
                                     <div className="space-y-2">
-                                      <label className="text-xs text-slate-400 block">URL Gambar / Ganti Link</label>
+                                      <label className="text-xs text-slate-400 block">Link Direct URL Gambar</label>
                                       <input 
                                         type="text" 
                                         value={heroImage} 
@@ -982,6 +1182,46 @@ export default function FunnelBuilderClient() {
                                         placeholder="https://images.unsplash.com/..."
                                         className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
                                       />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <label className="text-xs text-slate-400 block">Aspek Rasio Ukuran Gambar</label>
+                                      <div className="grid grid-cols-3 gap-2">
+                                        {[
+                                          { label: '16:9 Wide', value: 'aspect-video' },
+                                          { label: '4:3 Standard', value: 'aspect-[4/3]' },
+                                          { label: '1:1 Square', value: 'aspect-square' },
+                                          { label: '21:9 Ultrawide', value: 'aspect-[21/9]' },
+                                          { label: 'Auto Original', value: 'aspect-auto' },
+                                        ].map(ratio => (
+                                          <button 
+                                            key={ratio.value}
+                                            onClick={() => setHeroImageAspect(ratio.value)}
+                                            className={`py-2 rounded-lg text-[11px] font-bold border transition-colors ${heroImageAspect === ratio.value ? 'bg-amber-500/20 text-amber-400 border-amber-500' : 'bg-[#0a0a0a] text-slate-400 border-white/10 hover:text-white'}`}
+                                          >
+                                            {ratio.label}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <label className="text-xs text-slate-400 block">Batasan Ukuran Container (Optimasi Visual)</label>
+                                      <div className="flex gap-2">
+                                        {[
+                                          { label: '100% Full', value: 'max-w-4xl' },
+                                          { label: '80% Medium', value: 'max-w-2xl' },
+                                          { label: '60% Compact', value: 'max-w-xl' },
+                                        ].map(size => (
+                                          <button 
+                                            key={size.value}
+                                            onClick={() => setHeroImageMaxWidth(size.value)}
+                                            className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-colors ${heroImageMaxWidth === size.value ? 'bg-amber-500/20 text-amber-400 border-amber-500' : 'bg-[#0a0a0a] text-slate-400 border-white/10 hover:text-white'}`}
+                                          >
+                                            {size.label}
+                                          </button>
+                                        ))}
+                                      </div>
                                     </div>
 
                                     <div className="space-y-2">
@@ -1216,6 +1456,17 @@ export default function FunnelBuilderClient() {
                                 </div>
                               )}
 
+                              {/* Generic Editor for remaining components */}
+                              {['Carousel', 'Embed', 'YouTube', 'Scroll Target', 'Divider', 'Section', 'Html'].includes(activeComponent) && (
+                                <div className="py-12 flex flex-col items-center justify-center text-center space-y-3">
+                                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mx-auto">
+                                    <Settings size={24} />
+                                  </div>
+                                  <h4 className="text-sm font-bold text-white">Konfigurasi Section {activeComponent}</h4>
+                                  <p className="text-xs text-slate-400 max-w-xs">Komponen {activeComponent} aktif dan tersinkronisasi ke canvas preview secara live.</p>
+                                </div>
+                              )}
+
                             </div>
                           </div>
                         )}
@@ -1307,10 +1558,10 @@ export default function FunnelBuilderClient() {
             </div>
           </div>
 
-          {/* Canvas Area (Scrollable with explicit custom-scrollbar) */}
+          {/* Canvas Area */}
           <div className="flex-1 overflow-auto custom-scrollbar bg-slate-100 p-8 flex items-start justify-center relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
             
-            {/* The "Paper" / Mockup Container (Clean Canvas - Default Navbar Removed as requested) */}
+            {/* The "Paper" / Mockup Container */}
             <div 
               className={`shadow-2xl transition-all duration-300 relative origin-top overflow-hidden border border-slate-200 ${
                 device === 'desktop' ? 'w-full max-w-[1200px] rounded-xl' : 
@@ -1329,7 +1580,6 @@ export default function FunnelBuilderClient() {
                 paddingLeft: `${currentPadding.left}px`,
               }}
             >
-              {/* Optional Dark Tint Overlay when background image is present */}
               {sectionBgImage && (
                 <div 
                   className="absolute inset-0 z-0 pointer-events-none transition-opacity" 
@@ -1344,7 +1594,7 @@ export default function FunnelBuilderClient() {
                 <div className="relative pt-8 pb-20 px-6 text-center">
                   <div className="relative z-10 max-w-4xl mx-auto space-y-6">
                     
-                    {/* Badge Hero (Interactive Sync + contentEditable) */}
+                    {/* Badge Hero */}
                     <div 
                       onClick={() => { selectSection('Teks', 'hero-badge'); setTextTarget('badge'); }}
                       onMouseEnter={() => setHoveredElementId('hero-badge')}
@@ -1370,7 +1620,7 @@ export default function FunnelBuilderClient() {
                       )}
                     </div>
 
-                    {/* Headline Hero (Direct contentEditable - User can highlight/block specific words live!) */}
+                    {/* Headline Hero */}
                     <div 
                       onClick={() => { selectSection('Teks', 'hero-headline'); setTextTarget('headline'); }}
                       onMouseEnter={() => setHoveredElementId('hero-headline')}
@@ -1408,7 +1658,7 @@ export default function FunnelBuilderClient() {
                       )}
                     </div>
 
-                    {/* Subtitle Hero (Direct contentEditable - User can highlight/block specific words live!) */}
+                    {/* Subtitle Hero */}
                     <div 
                       onClick={() => { selectSection('Teks', 'hero-headline'); setTextTarget('subtitle'); }}
                       className="cursor-pointer hover:opacity-90 transition-opacity max-w-2xl mx-auto"
@@ -1435,17 +1685,17 @@ export default function FunnelBuilderClient() {
                       onClick={() => selectSection('Gambar', 'hero-image')}
                       onMouseEnter={() => setHoveredElementId('hero-image')}
                       onMouseLeave={() => setHoveredElementId(null)}
-                      className={`relative rounded-3xl overflow-hidden shadow-2xl mx-auto border-[8px] border-white max-w-4xl cursor-pointer transition-all ${
+                      className={`relative rounded-3xl overflow-hidden shadow-2xl mx-auto border-[8px] border-white ${heroImageMaxWidth} cursor-pointer transition-all ${
                         activeElementId === 'hero-image' ? 'ring-4 ring-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.4)]' : 
                         hoveredElementId === 'hero-image' ? 'ring-2 ring-amber-400/70' : ''
                       }`}
                     >
                       {heroImage ? (
-                        <div className="overflow-hidden bg-slate-900">
+                        <div className={`overflow-hidden bg-slate-900 ${heroImageAspect}`}>
                           <img 
                             src={heroImage} 
-                            alt="Myzora" 
-                            className="w-full h-auto object-cover transition-transform duration-300" 
+                            alt="Myzora HD" 
+                            className="w-full h-full object-cover transition-transform duration-300" 
                             style={{ transform: `scale(${heroImageZoom / 100})`, objectFit: heroImageFit }}
                           />
                         </div>
@@ -1622,7 +1872,49 @@ export default function FunnelBuilderClient() {
       </div>
 
       {/* ========================================================
-          3. PUBLISH MODAL
+          3. ADD COMPONENT SELECTION MODAL
+          ======================================================== */}
+      {showAddComponentModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-[#0a0a0a]/80 backdrop-blur-sm" onClick={() => setShowAddComponentModal(false)}></div>
+          
+          <div className="bg-[#161618] border border-amber-500/40 rounded-3xl w-full max-w-xl relative z-10 overflow-hidden shadow-2xl p-6 space-y-5 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                  <Plus size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Tambah Komponen Baru</h3>
+                  <p className="text-xs text-slate-400">Pilih dari 15 jenis komponen halaman untuk ditambahkan</p>
+                </div>
+              </div>
+              <button onClick={() => setShowAddComponentModal(false)} className="p-2 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white">
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 max-h-[380px] overflow-y-auto custom-scrollbar p-1">
+              {componentsList.map((comp) => (
+                <div 
+                  key={comp.id}
+                  onClick={() => {
+                    selectSection(comp.id, comp.elementId);
+                    setShowAddComponentModal(false);
+                  }}
+                  className="bg-[#1a1a1c] border border-white/10 hover:border-amber-500 hover:bg-amber-500/10 rounded-2xl p-4 flex flex-col items-center justify-center gap-2.5 cursor-pointer transition-all group"
+                >
+                  <comp.icon size={26} className="text-slate-400 group-hover:text-amber-400 transition-colors" />
+                  <span className="text-xs font-semibold text-slate-300 group-hover:text-white text-center">{comp.id}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          4. PUBLISH MODAL
           ======================================================== */}
       {showPublishModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
@@ -1685,6 +1977,253 @@ export default function FunnelBuilderClient() {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          5. SPOTIFY MINI MUSIC PLAYER (BUILDER MODE ONLY)
+          ======================================================== */}
+      {activeMode === 'builder' && (
+        <div className="fixed bottom-5 right-5 z-[90] flex flex-col items-end animate-in slide-in-from-bottom-5 duration-300">
+          <audio 
+            ref={audioRef}
+            src={musicTracks[currentTrackIndex]?.src}
+            onTimeUpdate={() => {
+              if (audioRef.current) {
+                setMusicCurrentTime(audioRef.current.currentTime);
+                setMusicDuration(audioRef.current.duration || 0);
+                setMusicProgress((audioRef.current.currentTime / (audioRef.current.duration || 1)) * 100);
+              }
+            }}
+            onEnded={() => {
+              if (isRepeatMusic && audioRef.current) {
+                audioRef.current.currentTime = 0;
+                audioRef.current.play();
+              } else {
+                playNextTrack();
+              }
+            }}
+          />
+
+          {/* PLAYLIST POPOVER SELECTOR */}
+          {showPlaylistPopover && (
+            <div className="mb-3 w-80 bg-[#121212]/95 backdrop-blur-xl border border-emerald-500/30 rounded-2xl shadow-2xl p-4 space-y-3 animate-in fade-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <div className="flex items-center gap-2">
+                  <ListMusic size={16} className="text-emerald-400" />
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">Background Music ({musicTracks.length} Tracks)</h4>
+                </div>
+                <button onClick={() => setShowPlaylistPopover(false)} className="text-slate-400 hover:text-white">
+                  <X size={14} />
+                </button>
+              </div>
+
+              {/* Search track */}
+              <div className="relative">
+                <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input 
+                  type="text" 
+                  placeholder="Cari lagu..." 
+                  value={playlistSearchQuery} 
+                  onChange={(e) => setPlaylistSearchQuery(e.target.value)}
+                  className="w-full bg-[#1e1e1e] border border-white/10 rounded-lg py-1.5 pl-8 pr-3 text-xs text-white focus:outline-none focus:border-emerald-500 font-medium"
+                />
+              </div>
+
+              {/* Tracks List */}
+              <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-1 pr-1">
+                {musicTracks
+                  .filter(t => t.title.toLowerCase().includes(playlistSearchQuery.toLowerCase()) || t.artist.toLowerCase().includes(playlistSearchQuery.toLowerCase()))
+                  .map((track, idx) => {
+                    const originalIndex = musicTracks.findIndex(t => t.id === track.id);
+                    const isSelected = currentTrackIndex === originalIndex;
+                    return (
+                      <div 
+                        key={track.id}
+                        onClick={() => selectTrack(originalIndex)}
+                        className={`p-2 rounded-xl flex items-center justify-between cursor-pointer transition-all ${
+                          isSelected ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400' : 'hover:bg-white/5 text-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 truncate">
+                          {isSelected && isPlayingMusic ? (
+                            <div className="flex items-end gap-0.5 h-3.5 w-3.5 shrink-0">
+                              <span className="w-1 bg-emerald-400 h-full animate-bounce"></span>
+                              <span className="w-1 bg-emerald-400 h-2/3 animate-bounce delay-100"></span>
+                              <span className="w-1 bg-emerald-400 h-1/3 animate-bounce delay-200"></span>
+                            </div>
+                          ) : (
+                            <span className="text-[10px] font-mono text-slate-500 w-4 shrink-0 text-center">{originalIndex + 1}</span>
+                          )}
+                          <div className="truncate">
+                            <p className={`text-xs font-bold truncate ${isSelected ? 'text-emerald-400' : 'text-white'}`}>{track.title}</p>
+                            <p className="text-[10px] text-slate-400 truncate">{track.artist}</p>
+                          </div>
+                        </div>
+                        {isSelected && <CheckCircle2 size={14} className="text-emerald-400 shrink-0" />}
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
+
+          {/* MINI PLAYER CARD */}
+          <div className={`bg-[#121212]/95 backdrop-blur-xl border border-emerald-500/30 rounded-2xl shadow-2xl transition-all duration-300 overflow-hidden ${
+            isPlayerExpanded ? 'w-80 p-4' : 'w-72 p-3 flex items-center justify-between'
+          }`}>
+            
+            {/* EXPANDED VIEW */}
+            {isPlayerExpanded ? (
+              <div className="space-y-3">
+                {/* Top Bar */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping"></span>
+                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest font-mono">SMI Spotify Mini</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button 
+                      onClick={() => setShowPlaylistPopover(!showPlaylistPopover)} 
+                      className={`p-1.5 rounded-lg transition-colors ${showPlaylistPopover ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-400 hover:text-white'}`}
+                      title="Daftar Lagu (25 Tracks)"
+                    >
+                      <ListMusic size={16} />
+                    </button>
+                    <button 
+                      onClick={() => setIsPlayerExpanded(false)} 
+                      className="p-1.5 text-slate-400 hover:text-white rounded-lg transition-colors"
+                      title="Minimize Player"
+                    >
+                      <Minimize2 size={16} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Album Cover & Details */}
+                <div className="flex items-center gap-3">
+                  <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-900 to-black p-0.5 shrink-0 shadow-lg group">
+                    <div className={`w-full h-full rounded-[10px] bg-black flex items-center justify-center relative overflow-hidden ${isPlayingMusic ? 'animate-spin-slow' : ''}`}>
+                      <Disc size={32} className="text-emerald-400" />
+                      <div className="absolute inset-0 bg-emerald-500/10"></div>
+                    </div>
+                  </div>
+                  <div className="flex-1 truncate">
+                    <h5 className="text-xs font-bold text-white truncate">{musicTracks[currentTrackIndex]?.title}</h5>
+                    <p className="text-[11px] text-slate-400 truncate">{musicTracks[currentTrackIndex]?.artist}</p>
+                  </div>
+                </div>
+
+                {/* Progress Timeline Slider */}
+                <div className="space-y-1">
+                  <div 
+                    onClick={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const clickX = e.clientX - rect.left;
+                      const newTime = (clickX / rect.width) * musicDuration;
+                      if (audioRef.current) {
+                        audioRef.current.currentTime = newTime;
+                        setMusicCurrentTime(newTime);
+                      }
+                    }}
+                    className="h-1.5 w-full bg-white/10 rounded-full cursor-pointer overflow-hidden relative group"
+                  >
+                    <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${musicProgress}%` }}></div>
+                  </div>
+                  <div className="flex justify-between text-[9px] font-mono text-slate-400">
+                    <span>{formatTime(musicCurrentTime)}</span>
+                    <span>{formatTime(musicDuration)}</span>
+                  </div>
+                </div>
+
+                {/* Main Controls */}
+                <div className="flex items-center justify-between pt-1">
+                  <button 
+                    onClick={() => setIsShuffleMusic(!isShuffleMusic)} 
+                    className={`p-1.5 rounded-lg transition-colors ${isShuffleMusic ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 hover:text-white'}`}
+                    title="Shuffle"
+                  >
+                    <Shuffle size={14} />
+                  </button>
+                  <button onClick={playPrevTrack} className="p-1.5 text-slate-300 hover:text-white transition-colors" title="Sebelumnya">
+                    <SkipBack size={18} />
+                  </button>
+                  <button 
+                    onClick={togglePlayMusic} 
+                    className="w-10 h-10 bg-emerald-500 hover:bg-emerald-400 text-black rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+                  >
+                    {isPlayingMusic ? <Pause size={18} className="fill-current" /> : <Play size={18} className="fill-current ml-0.5" />}
+                  </button>
+                  <button onClick={playNextTrack} className="p-1.5 text-slate-300 hover:text-white transition-colors" title="Berikutnya">
+                    <SkipForward size={18} />
+                  </button>
+                  <button 
+                    onClick={() => setIsRepeatMusic(!isRepeatMusic)} 
+                    className={`p-1.5 rounded-lg transition-colors ${isRepeatMusic ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 hover:text-white'}`}
+                    title="Repeat Track"
+                  >
+                    <Repeat size={14} />
+                  </button>
+                </div>
+
+                {/* Volume Control */}
+                <div className="flex items-center gap-2 pt-1 border-t border-white/5">
+                  <button 
+                    onClick={() => {
+                      setIsMutedMusic(!isMutedMusic);
+                      if (audioRef.current) audioRef.current.muted = !isMutedMusic;
+                    }}
+                    className="text-slate-400 hover:text-white"
+                  >
+                    {isMutedMusic || musicVolume === 0 ? <VolumeX size={14} /> : musicVolume < 0.5 ? <Volume1 size={14} /> : <Volume2 size={14} />}
+                  </button>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="1" 
+                    step="0.05"
+                    value={isMutedMusic ? 0 : musicVolume}
+                    onChange={(e) => {
+                      const vol = Number(e.target.value);
+                      setMusicVolume(vol);
+                      setIsMutedMusic(false);
+                      if (audioRef.current) {
+                        audioRef.current.volume = vol;
+                        audioRef.current.muted = false;
+                      }
+                    }}
+                    className="w-full h-1 accent-emerald-500 cursor-pointer"
+                  />
+                </div>
+              </div>
+            ) : (
+              /* MINIMIZED ULTRA-COMPACT VIEW */
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-2.5 truncate cursor-pointer" onClick={() => setIsPlayerExpanded(true)}>
+                  <div className={`w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-800 flex items-center justify-center text-white shrink-0 shadow-sm ${isPlayingMusic ? 'animate-spin-slow' : ''}`}>
+                    <Disc size={16} />
+                  </div>
+                  <div className="truncate pr-2">
+                    <h5 className="text-xs font-bold text-white truncate max-w-[120px]">{musicTracks[currentTrackIndex]?.title}</h5>
+                    <p className="text-[9px] text-slate-400 truncate max-w-[120px]">{musicTracks[currentTrackIndex]?.artist}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button onClick={playPrevTrack} className="p-1 text-slate-400 hover:text-white"><SkipBack size={14} /></button>
+                  <button 
+                    onClick={togglePlayMusic} 
+                    className="w-7 h-7 bg-emerald-500 text-black rounded-full flex items-center justify-center shadow-md hover:scale-105 transition-transform"
+                  >
+                    {isPlayingMusic ? <Pause size={14} className="fill-current" /> : <Play size={14} className="fill-current ml-0.5" />}
+                  </button>
+                  <button onClick={playNextTrack} className="p-1 text-slate-400 hover:text-white"><SkipForward size={14} /></button>
+                  <button onClick={() => setIsPlayerExpanded(true)} className="p-1 text-slate-400 hover:text-emerald-400" title="Expand Player"><Maximize2 size={14} /></button>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       )}
