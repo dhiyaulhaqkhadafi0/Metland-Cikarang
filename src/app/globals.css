@@ -38,19 +38,37 @@
   }
 }
 
-/* Custom scrollbar for premium feel */
+/* Custom scrollbar for premium feel & high visibility */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 12px;
+  height: 12px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-dark-bg);
+  background: #0d0e12;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-dark-card-hover);
-  border-radius: 4px;
+  background: #374151;
+  border-radius: 6px;
+  border: 3px solid #0d0e12;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary);
+  background: #f59e0b;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #111113;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 6px;
+  border: 3px solid #111113;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b;
 }
 
 /* Fix Autofill styling for Chromium browsers to prevent background changing to red/yellow */
