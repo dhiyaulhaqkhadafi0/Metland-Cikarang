@@ -214,7 +214,7 @@ export default function HomeDashboardClient({ initialLeads }: { initialLeads: an
               onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-all appearance-none cursor-pointer"
             >
-              <option value="all" className="bg-[#0B0F14]">Semua Status Pipeline</option>
+              <option value="all" className="bg-[#0B0F14]">Pipeline</option>
               <option value="New" className="bg-[#0B0F14]">Baru Masuk (New)</option>
               <option value="Contacted" className="bg-[#0B0F14]">Sudah Dihubungi</option>
               <option value="Survey" className="bg-[#0B0F14]">Survei Lokasi</option>
@@ -233,19 +233,26 @@ export default function HomeDashboardClient({ initialLeads }: { initialLeads: an
               onChange={(e) => setClusterFilter(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-all appearance-none cursor-pointer"
             >
-              <option value="all" className="bg-[#0B0F14]">Semua Sub-cluster / Unit</option>
+              <option value="all" className="bg-[#0B0F14]">Type Unit</option>
               <optgroup label="Avesa Garden" className="bg-[#0B0F14] text-emerald-400 font-bold">
-                <option value="canary" className="bg-[#0B0F14] text-white">Canary</option>
-                <option value="derora" className="bg-[#0B0F14] text-white">Derora</option>
+                <option value="Canary (Tipe 22/72)" className="bg-[#0B0F14] text-white">Canary - Tipe 22/72</option>
+                <option value="Canary (Tipe 30/72)" className="bg-[#0B0F14] text-white">Canary - Tipe 30/72</option>
+                <option value="Derora (Tipe 33/72)" className="bg-[#0B0F14] text-white">Derora - Tipe 33/72</option>
+                <option value="Derora (Tipe 59/84)" className="bg-[#0B0F14] text-white">Derora - Tipe 59/84</option>
               </optgroup>
               <optgroup label="Brassia Garden" className="bg-[#0B0F14] text-emerald-400 font-bold">
-                <option value="myzora" className="bg-[#0B0F14] text-white">Myzora</option>
-                <option value="ellyra" className="bg-[#0B0F14] text-white">Ellyra</option>
-                <option value="brassia" className="bg-[#0B0F14] text-white">Brassia (General)</option>
+                <option value="Myzora (Tipe 33/72)" className="bg-[#0B0F14] text-white">Myzora - Tipe 33/72</option>
+                <option value="Myzora (Tipe 45/72)" className="bg-[#0B0F14] text-white">Myzora - Tipe 45/72</option>
+                <option value="Myzora (Tipe 56/84)" className="bg-[#0B0F14] text-white">Myzora - Tipe 56/84</option>
+                <option value="Myzora (Tipe 77/98)" className="bg-[#0B0F14] text-white">Myzora - Tipe 77/98</option>
+                <option value="Ellyra (Tipe 45/72)" className="bg-[#0B0F14] text-white">Ellyra - Tipe 45/72</option>
+                <option value="Ellyra (Tipe 56/84)" className="bg-[#0B0F14] text-white">Ellyra - Tipe 56/84</option>
+                <option value="Ellyra (Tipe 56/98)" className="bg-[#0B0F14] text-white">Ellyra - Tipe 56/98</option>
+                <option value="Brassia Garden" className="bg-[#0B0F14] text-white">Brassia (General)</option>
               </optgroup>
               <optgroup label="Komersial" className="bg-[#0B0F14] text-emerald-400 font-bold">
-                <option value="easton" className="bg-[#0B0F14] text-white">Ruko Easton</option>
-                <option value="weston" className="bg-[#0B0F14] text-white">Weston Gateway</option>
+                <option value="Ruko Easton" className="bg-[#0B0F14] text-white">Ruko Easton</option>
+                <option value="Weston Gateway" className="bg-[#0B0F14] text-white">Weston Gateway</option>
               </optgroup>
             </select>
           </div>
@@ -258,7 +265,7 @@ export default function HomeDashboardClient({ initialLeads }: { initialLeads: an
               onChange={(e) => setDateFilter(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-all appearance-none cursor-pointer"
             >
-              <option value="all" className="bg-[#0B0F14]">Semua Rentang Waktu</option>
+              <option value="all" className="bg-[#0B0F14]">Waktu</option>
               <option value="today" className="bg-[#0B0F14]">Hari Ini</option>
               <option value="week" className="bg-[#0B0F14]">7 Hari Terakhir</option>
               <option value="month" className="bg-[#0B0F14]">Bulan Ini</option>

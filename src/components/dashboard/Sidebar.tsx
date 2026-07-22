@@ -10,7 +10,6 @@ const navItems = [
   { name: 'Lead Inbox', href: '/dashboard/leads', icon: Users },
   { name: 'Campaign Links', href: '/dashboard/campaigns', icon: LinkIcon },
   { name: 'Ketersediaan Unit', href: '/dashboard/units', icon: Building2 },
-  { name: 'Pengaturan Akun', href: '/dashboard/settings', icon: Settings },
 ]
 
 export function Sidebar({ isCollapsed }: { isCollapsed?: boolean }) {

@@ -19,7 +19,7 @@ const compressImage = (file: File): Promise<string> => {
       URL.revokeObjectURL(url);
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      const maxDim = 120;
+      const maxDim = 180;
       let width = img.width;
       let height = img.height;
 
@@ -38,7 +38,7 @@ const compressImage = (file: File): Promise<string> => {
       canvas.width = width;
       canvas.height = height;
       ctx?.drawImage(img, 0, 0, width, height);
-      resolve(canvas.toDataURL('image/jpeg', 0.5));
+      resolve(canvas.toDataURL('image/jpeg', 0.7));
     };
     img.onerror = (err) => {
       URL.revokeObjectURL(url);
@@ -237,7 +237,7 @@ export default function SettingsPage() {
           onClick={() => setActiveTab('notifications')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${activeTab === 'notifications' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
         >
-          <Bell size={16} /> Notifikasi Lead
+          <Bell size={16} /> Manajemen Notifikasi
         </button>
         <button
           onClick={() => setActiveTab('security')}

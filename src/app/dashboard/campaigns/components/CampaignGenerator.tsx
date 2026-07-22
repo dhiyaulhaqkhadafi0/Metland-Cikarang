@@ -68,36 +68,36 @@ export default function CampaignGenerator({ onGenerated }: { onGenerated: () => 
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Section 1: Main Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Nama Sales</label>
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Nama Sales</label>
             <input 
               required 
               name="sales_name" 
               value={salesName}
               onChange={(e) => setSalesName(e.target.value)}
               placeholder="Misal: Daffa Khadafi" 
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500/50 outline-none" 
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500/50 outline-none transition-all" 
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Nama Campaign Iklan</label>
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Nama Campaign Iklan</label>
             <input 
               required 
               name="campaign_name" 
               placeholder="Misal: Meta-Ads-Promo-Myzora" 
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500/50 outline-none" 
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500/50 outline-none transition-all" 
             />
           </div>
         </div>
 
         {/* Section 2: Destination & Platform */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Platform (Sumber Iklan)</label>
-            <select required name="platform" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:border-emerald-500/50 outline-none cursor-pointer">
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Platform (Sumber Iklan)</label>
+            <select required name="platform" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:border-emerald-500/50 outline-none cursor-pointer transition-all">
               <option value="Facebook Ads" className="bg-[#0B0F14]">Facebook Ads</option>
               <option value="Instagram Ads" className="bg-[#0B0F14]">Instagram Ads</option>
               <option value="TikTok Ads" className="bg-[#0B0F14]">TikTok Ads</option>
@@ -107,8 +107,8 @@ export default function CampaignGenerator({ onGenerated }: { onGenerated: () => 
             </select>
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Sub-cluster / Unit Target</label>
-            <select required name="cluster" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:border-emerald-500/50 outline-none cursor-pointer">
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Sub-cluster / Unit Target</label>
+            <select required name="cluster" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:border-emerald-500/50 outline-none cursor-pointer transition-all">
               <option value="Semua Unit" className="bg-[#0B0F14]">Semua Unit (Landing Page)</option>
               <optgroup label="Avesa Garden" className="bg-[#0B0F14] text-emerald-400 font-bold">
                 <option value="Canary" className="bg-[#0B0F14] text-white">Canary</option>
@@ -125,38 +125,38 @@ export default function CampaignGenerator({ onGenerated }: { onGenerated: () => 
             </select>
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Link Asli Target Landing Page</label>
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Link Target Landing Page</label>
             <div className="relative">
-              <Globe size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <Globe size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
               <input 
                 name="original_url" 
                 placeholder="https://metland.id/discover" 
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500/50 outline-none" 
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500/50 outline-none transition-all" 
               />
             </div>
           </div>
         </div>
 
         {/* Section 3: Tracking Pixels (Meta & TikTok) */}
-        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10 space-y-3 mt-2">
-          <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 uppercase tracking-wider">
-            <Target size={14} /> Pengaturan Tracking Pixel (Opsional untuk Iklan Berbayar)
+        <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 space-y-4 mt-4 shadow-inner">
+          <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">
+            <Target size={16} /> Pengaturan Tracking Pixel (Opsional)
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">Meta Pixel ID (Facebook / Instagram)</label>
+              <label className="block text-xs font-medium text-slate-400 mb-2">Meta Pixel ID (Facebook / Instagram)</label>
               <input 
                 name="meta_pixel_id" 
                 placeholder="Misal: 123456789098765" 
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder:text-slate-600 focus:border-emerald-500/50 outline-none font-mono" 
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500/50 outline-none font-mono transition-all" 
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">TikTok Pixel ID</label>
+              <label className="block text-xs font-medium text-slate-400 mb-2">TikTok Pixel ID</label>
               <input 
                 name="tiktok_pixel_id" 
                 placeholder="Misal: C1234567890ABCD" 
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder:text-slate-600 focus:border-emerald-500/50 outline-none font-mono" 
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500/50 outline-none font-mono transition-all" 
               />
             </div>
           </div>
