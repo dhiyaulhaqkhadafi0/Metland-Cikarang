@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { 
   PenTool, Target, Layers, ChevronRight, 
-  Sparkles, Zap, ArrowRight, Save, Copy, RefreshCw, FileText, Download, Check,
-  Cpu, FileDown, ShieldCheck, Flame, BarChart3, Heart, Eye, Award
+  Wand2, Zap, ArrowRight, Save, Copy, RefreshCw, FileText, Download, Check,
+  Cpu, FileDown, ShieldCheck, Flame, BarChart3, Heart, Eye, Award, Printer
 } from 'lucide-react';
 import Link from 'next/link';
 import { 
@@ -41,7 +41,7 @@ export default function CopywriterClient() {
   const [outputs, setOutputs] = useState<OutputVersion[]>([]);
   const [activeTab, setActiveTab] = useState(0);
   const [copied, setCopied] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Available templates for selected category
   const currentTemplates = copywritingTemplates[selectedCategory] || [];
@@ -53,6 +53,11 @@ export default function CopywriterClient() {
       setSelectedTemplate(templates[0].id);
     }
   }, [selectedCategory]);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
 
   const handleGenerate = () => {
     setIsGenerating(true);
@@ -118,13 +123,9 @@ export default function CopywriterClient() {
     if (outputs[activeTab]) {
       navigator.clipboard.writeText(outputs[activeTab].text);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      showToast("Teks berhasil disalin ke clipboard!");
+      setTimeout(() => setCopied(false), 2500);
     }
-  };
-
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
   };
 
   const handleExportWord = () => {
@@ -147,16 +148,68 @@ export default function CopywriterClient() {
     link.download = `Copywriting_${selectedTemplate}_${outputs[activeTab].badge}.txt`;
     link.click();
     URL.revokeObjectURL(url);
+    showToast("File Word/Dokumen berhasil diunduh!");
   };
 
   const handleExportPDF = () => {
     if (!outputs[activeTab]) return;
-    window.print();
+    const activeOutput = outputs[activeTab];
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Metland Copywriting - ${activeOutput.badge}</title>
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 40px; color: #0f172a; line-height: 1.6; background-color: #ffffff; }
+              .header { border-bottom: 3px solid #059669; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+              .logo { font-size: 22px; font-weight: 800; color: #059669; letter-spacing: -0.5px; }
+              .meta { color: #64748b; font-size: 12px; }
+              .badge { display: inline-block; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 6px 16px; border-radius: 99px; font-weight: 700; font-size: 13px; margin-bottom: 20px; text-transform: uppercase; }
+              .content { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 28px; font-size: 15px; white-space: pre-wrap; color: #0f172a; font-weight: 400; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+              .scores { margin-top: 28px; border-top: 1px solid #e2e8f0; pt-20; font-size: 13px; color: #334155; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+              .score-box { background: #f1f5f9; padding: 12px 16px; border-radius: 12px; font-weight: 600; }
+              .footer { margin-top: 40px; font-size: 11px; color: #94a3b8; text-align: center; border-top: 1px solid #f1f5f9; pt-16; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <div>
+                <div class="logo">METLAND CIKARANG — SMI AGENT</div>
+                <div class="meta">SMI AI Copywriter Studio Export • ${new Date().toLocaleDateString('id-ID')}</div>
+              </div>
+            </div>
+            <div class="badge">${activeOutput.badge.toUpperCase()} (${activeOutput.title})</div>
+            <div class="content">${activeOutput.text}</div>
+            <div class="scores">
+              <div class="score-box">🎯 Persuasion Index: ${activeOutput.score.persuasion}/100</div>
+              <div class="score-box">💖 Emotional Hook: ${activeOutput.score.emotional}/100</div>
+              <div class="score-box">📖 Clarity: ${activeOutput.score.clarity}</div>
+              <div class="score-box">🔥 Conversion Potential: ${activeOutput.score.conversion}</div>
+            </div>
+            <div class="footer">Dicetak eksklusif melalui Sales Metland Intelligence Platform v2.0</div>
+            <script>
+              window.onload = function() { window.print(); }
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#06090E] text-slate-100 pb-20 animate-in fade-in duration-700 relative">
       
+      {/* Toast Notification Banner */}
+      {toastMessage && (
+        <div className="fixed top-20 right-6 z-50 bg-emerald-500 text-black px-5 py-3 rounded-2xl shadow-2xl font-bold text-sm flex items-center gap-2 animate-in slide-in-from-top duration-300">
+          <Check size={18} />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* Background Animated Gradient Mesh */}
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-emerald-500/10 blur-[150px] animate-pulse"></div>
@@ -221,7 +274,7 @@ export default function CopywriterClient() {
                 </div>
                 
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-300">
-                  <Sparkles size={14} className="text-amber-400" />
+                  <Wand2 size={14} className="text-emerald-400" />
                   <span>AI Copywriting Studio</span>
                 </div>
               </div>
@@ -264,8 +317,8 @@ export default function CopywriterClient() {
                       </>
                     ) : (
                       <>
-                        <Sparkles size={18} className="text-amber-300 animate-pulse" />
-                        <span>Hasilkan 3 Versi Copy</span>
+                        <Wand2 size={18} className="text-amber-300 animate-pulse" />
+                        <span>Hasikan 3 Versi Copy</span>
                         <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
                       </>
                     )}
@@ -333,18 +386,32 @@ export default function CopywriterClient() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-2">Target Cluster / Unit (Opsional)</label>
+              <label className="block text-xs font-medium text-slate-400 mb-2">Target Cluster & Tipe Unit (Lengkap)</label>
               <select
                 value={selectedCluster}
                 onChange={(e) => setSelectedCluster(e.target.value)}
                 className="w-full bg-[#0E1420] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-emerald-500/50 outline-none"
               >
                 <option value="">Semua Cluster / Metland Cikarang</option>
-                <option value="Avesa Garden - Canary (32/72)">Avesa Garden — Canary (32/72)</option>
-                <option value="Avesa Garden - Derora (50/72)">Avesa Garden — Derora (50/72)</option>
-                <option value="Brassia Garden - Myzora (38/72)">Brassia Garden — Myzora (38/72)</option>
-                <option value="Brassia Garden - Ellyra (46/72)">Brassia Garden — Ellyra (46/72)</option>
-                <option value="Commercial Ruko Easton & Weston">Commercial — Ruko Easton & Weston</option>
+                <optgroup label="Avesa Garden">
+                  <option value="Avesa Garden - Canary (22/72)">Avesa Garden — Canary (22/72)</option>
+                  <option value="Avesa Garden - Canary (30/72)">Avesa Garden — Canary (30/72)</option>
+                  <option value="Avesa Garden - Derora (33/72)">Avesa Garden — Derora (33/72)</option>
+                  <option value="Avesa Garden - Derora (59/84)">Avesa Garden — Derora (59/84)</option>
+                </optgroup>
+                <optgroup label="Brassia Garden">
+                  <option value="Brassia Garden - Myzora (33/72)">Brassia Garden — Myzora (33/72)</option>
+                  <option value="Brassia Garden - Myzora (45/72)">Brassia Garden — Myzora (45/72)</option>
+                  <option value="Brassia Garden - Myzora (56/84)">Brassia Garden — Myzora (56/84)</option>
+                  <option value="Brassia Garden - Myzora (77/98)">Brassia Garden — Myzora (77/98)</option>
+                  <option value="Brassia Garden - Ellyra (45/72)">Brassia Garden — Ellyra (45/72)</option>
+                  <option value="Brassia Garden - Ellyra (56/84)">Brassia Garden — Ellyra (56/84)</option>
+                  <option value="Brassia Garden - Ellyra (56/98)">Brassia Garden — Ellyra (56/98)</option>
+                </optgroup>
+                <optgroup label="Commercial">
+                  <option value="Commercial - Ruko Easton">Commercial — Ruko Easton</option>
+                  <option value="Commercial - Ruko Weston">Commercial — Ruko Weston</option>
+                </optgroup>
               </select>
             </div>
 
@@ -370,7 +437,7 @@ export default function CopywriterClient() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
               <div>
                 <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Sparkles className="text-emerald-400" size={20} />
+                  <Wand2 className="text-emerald-400" size={20} />
                   Hasil AI Copywriting Studio (3 Versi Penulisan)
                 </h3>
                 <p className="text-xs text-slate-400 mt-1">
@@ -378,7 +445,7 @@ export default function CopywriterClient() {
                 </p>
               </div>
 
-              {/* Action Buttons (Export Word, PDF, Copy, Save) */}
+              {/* Action Buttons (Export Word, PDF, Copy Versi Ini) */}
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={handleExportWord}
@@ -394,24 +461,16 @@ export default function CopywriterClient() {
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-slate-200 transition-colors"
                   title="Cetak atau simpan PDF"
                 >
-                  <Download size={14} className="text-red-400" />
-                  <span>PDF</span>
-                </button>
-
-                <button
-                  onClick={handleSave}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-slate-200 transition-colors"
-                >
-                  {saved ? <Check size={14} className="text-emerald-400" /> : <Save size={14} className="text-indigo-400" />}
-                  <span>{saved ? 'Tersimpan!' : 'Simpan'}</span>
+                  <Printer size={14} className="text-red-400" />
+                  <span>Cetak PDF</span>
                 </button>
 
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs shadow-lg shadow-emerald-500/20 transition-all"
+                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs shadow-lg shadow-emerald-500/20 transition-all"
                 >
-                  {copied ? <Check size={14} /> : <Copy size={14} />}
-                  <span>{copied ? 'Tersalin!' : 'Salin Copy'}</span>
+                  {copied ? <Check size={16} /> : <Copy size={16} />}
+                  <span>{copied ? 'Tersalin!' : 'Salin / Copy Versi Ini'}</span>
                 </button>
               </div>
             </div>
@@ -450,8 +509,8 @@ export default function CopywriterClient() {
               <div className="lg:col-span-2 rounded-3xl bg-[#0A0E17] border border-white/10 p-6 md:p-8 space-y-4 relative">
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <span className="text-xs font-mono text-emerald-400">VARIATION {activeTab + 1}: {outputs[activeTab].badge.toUpperCase()}</span>
-                  <button onClick={handleCopy} className="text-xs text-slate-400 hover:text-white flex items-center gap-1">
-                    <Copy size={12} /> Salin Teks Ini
+                  <button onClick={handleCopy} className="text-xs text-emerald-400 hover:underline flex items-center gap-1.5 font-bold">
+                    <Copy size={14} /> Salin / Copy Teks Ini
                   </button>
                 </div>
 

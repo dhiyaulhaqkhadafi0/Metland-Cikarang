@@ -60,11 +60,11 @@ export default function SettingsPage() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
+    fullName: 'Daffa Khadafi',
+    email: 'daffakhadafi692@gmail.com',
+    phone: '081946838791',
     title: 'Senior Sales Executive',
-    refCode: '',
+    refCode: 'REF-DAFFA',
     waNumber: '6281946838791',
     waMessage: 'Halo Metland, saya tertarik dengan informasi properti lebih lanjut.',
     notifyEmail: true,
@@ -75,31 +75,50 @@ export default function SettingsPage() {
 
   useEffect(() => {
     async function loadUserData() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const metaName = user.user_metadata?.full_name || user.user_metadata?.name;
-        let formattedName = metaName;
-        
-        if (!formattedName && user.email) {
-          const username = user.email.split('@')[0].replace(/[0-9_]/g, ' ');
-          formattedName = username.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ').trim();
+      // First load from localStorage for instant display & offline persistence
+      const savedProfile = localStorage.getItem('sales_profile_data');
+      if (savedProfile) {
+        try {
+          const parsed = JSON.parse(savedProfile);
+          setFormData(prev => ({ ...prev, ...parsed }));
+        } catch (e) {
+          console.error("Failed to parse local profile data", e);
         }
+      }
 
-        const initialRef = `REF-${(user.email ? user.email.split('@')[0] : 'SALES').toUpperCase()}`;
+      const localAvatar = localStorage.getItem('sales_avatar_url');
+      if (localAvatar) {
+        setAvatarUrl(localAvatar);
+      }
 
-        // Load avatar from localStorage
-        const localAvatar = localStorage.getItem('sales_avatar_url');
-        if (localAvatar) {
-          setAvatarUrl(localAvatar);
+      // Sync with Supabase Auth user if available
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const metaName = user.user_metadata?.full_name || user.user_metadata?.name;
+          let formattedName = metaName;
+          
+          if (!formattedName && user.email) {
+            const username = user.email.split('@')[0].replace(/[0-9_]/g, ' ');
+            formattedName = username.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ').trim();
+          }
+
+          const initialRef = `REF-${(user.email ? user.email.split('@')[0] : 'SALES').toUpperCase()}`;
+
+          setFormData(prev => {
+            const updated = {
+              ...prev,
+              fullName: formattedName || prev.fullName || 'Daffa Khadafi',
+              email: user.email || prev.email || 'daffakhadafi692@gmail.com',
+              phone: user.user_metadata?.phone || prev.phone || '081946838791',
+              refCode: user.user_metadata?.ref_code || prev.refCode || initialRef
+            };
+            localStorage.setItem('sales_profile_data', JSON.stringify(updated));
+            return updated;
+          });
         }
-
-        setFormData(prev => ({
-          ...prev,
-          fullName: formattedName || 'Daffa Khadafi',
-          email: user.email || 'daffakhadafi692@gmail.com',
-          phone: user.user_metadata?.phone || '081946838791',
-          refCode: user.user_metadata?.ref_code || initialRef
-        }));
+      } catch (err) {
+        console.error("Supabase loadUser error:", err);
       }
     }
     loadUserData();
@@ -158,6 +177,8 @@ export default function SettingsPage() {
     setIsSaved(false);
 
     try {
+      localStorage.setItem('sales_profile_data', JSON.stringify(formData));
+
       if (avatarUrl) {
         try {
           localStorage.setItem('sales_avatar_url', avatarUrl);
@@ -180,6 +201,9 @@ export default function SettingsPage() {
       setTimeout(() => setIsSaved(false), 3000);
     } catch (err) {
       console.error("Gagal update profil:", err);
+      // Still show saved success because local data was saved
+      setIsSaved(true);
+      setTimeout(() => setIsSaved(false), 3000);
     } finally {
       setIsLoading(false);
     }
