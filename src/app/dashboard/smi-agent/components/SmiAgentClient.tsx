@@ -42,8 +42,8 @@ const aiFeatures = [
     shadow: 'shadow-[0_0_20px_rgba(245,158,11,0.3)]'
   },
   {
-    id: 'content',
-    title: 'AI Content Creation',
+    id: 'content-studio',
+    title: 'AI Content Studio',
     description: 'Hasilkan ide video TikTok/Reels, naskah presentasi, dan konsep visual unit yang viral.',
     icon: ImageIcon,
     color: 'from-pink-400 via-rose-400 to-red-500',

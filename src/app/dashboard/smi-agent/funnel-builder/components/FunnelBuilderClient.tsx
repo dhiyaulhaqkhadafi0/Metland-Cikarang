@@ -138,6 +138,10 @@ export default function FunnelBuilderClient() {
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [publishProgress, setPublishProgress] = useState(0);
 
+  // Draft State
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [isDraftSaved, setIsDraftSaved] = useState(false);
+
   // --------------------------------------------------------------------------
   // Spotify Mini Background Music Player (High-Speed Cloud Stream CDN - 0MB Repo Load)
   // --------------------------------------------------------------------------
@@ -259,6 +263,17 @@ export default function FunnelBuilderClient() {
         return prev + 1;
       });
     }, 1000);
+  };
+
+  const handleSaveDraft = () => {
+    setIsSavingDraft(true);
+    // Simulate API call to save draft
+    setTimeout(() => {
+      setIsSavingDraft(false);
+      setIsDraftSaved(true);
+      // Reset success state after 3 seconds
+      setTimeout(() => setIsDraftSaved(false), 3000);
+    }, 1200);
   };
 
   // Execute native rich inline formatting on active selection
@@ -427,8 +442,23 @@ export default function FunnelBuilderClient() {
           >
             <RotateCcw size={18} />
           </button>
-          <button className="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm font-bold transition-all border border-white/10 flex items-center gap-2">
-            <Save size={16} /> Simpan Draft
+          <button 
+            onClick={handleSaveDraft}
+            disabled={isSavingDraft}
+            className={`px-4 py-2.5 hover:bg-white/10 rounded-lg text-sm font-bold transition-all border flex items-center gap-2 ${
+              isDraftSaved 
+                ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' 
+                : 'bg-white/5 text-white border-white/10'
+            }`}
+          >
+            {isSavingDraft ? (
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : isDraftSaved ? (
+              <CheckCircle2 size={16} />
+            ) : (
+              <Save size={16} />
+            )}
+            {isSavingDraft ? 'Menyimpan...' : isDraftSaved ? 'Draft Tersimpan' : 'Simpan Draft'}
           </button>
           <button 
             onClick={handlePublish}
