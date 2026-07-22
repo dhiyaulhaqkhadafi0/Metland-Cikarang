@@ -10,6 +10,44 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
+// Client-side lightweight image compression (max 120x120 JPEG ~1.5KB)
+const compressImage = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const maxDim = 120;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > maxDim) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        }
+      } else {
+        if (height > maxDim) {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      ctx?.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', 0.5));
+    };
+    img.onerror = (err) => {
+      URL.revokeObjectURL(url);
+      reject(err);
+    };
+    img.src = url;
+  });
+};
+
 export default function SettingsPage() {
   const supabase = createClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -49,7 +87,17 @@ export default function SettingsPage() {
 
         const initialRef = `REF-${(user.email ? user.email.split('@')[0] : 'SALES').toUpperCase()}`;
 
-        setAvatarUrl(user.user_metadata?.avatar_url || null);
+        // Auto-fix: if avatar_url is uncompressed (>4KB), reset it to prevent 494 REQUEST_HEADER_TOO_LARGE
+        const rawAvatar = user.user_metadata?.avatar_url || null;
+        if (rawAvatar && rawAvatar.length > 4000) {
+          await supabase.auth.updateUser({
+            data: { avatar_url: null }
+          });
+          setAvatarUrl(null);
+        } else {
+          setAvatarUrl(rawAvatar);
+        }
+
         setFormData(prev => ({
           ...prev,
           fullName: formattedName || 'Daffa Khadafi',
@@ -66,24 +114,27 @@ export default function SettingsPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Avatar Upload Handler
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Avatar Upload Handler with Automatic Compression
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const base64Data = reader.result as string;
-      setAvatarUrl(base64Data);
+    try {
+      setIsLoading(true);
+      const compressedData = await compressImage(file);
+      setAvatarUrl(compressedData);
       
-      // Persist directly to Supabase User Metadata
+      // Persist lightweight compressed image to Supabase User Metadata (<1.5KB)
       await supabase.auth.updateUser({
-        data: { avatar_url: base64Data }
+        data: { avatar_url: compressedData }
       });
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 3000);
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error("Gagal mengompres foto profil:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Avatar Delete Handler
@@ -201,9 +252,11 @@ export default function SettingsPage() {
         <Card className="border-white/10 bg-[#0B0F14]">
           <CardContent className="p-6 space-y-6">
             
-            {/* Avatar Upload Header */}
-            <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-white/10">
-              <div className="relative group">
+            {/* Prominent Avatar Upload Header */}
+            <div className="flex flex-col sm:flex-row items-center gap-8 pb-6 border-b border-white/10">
+              
+              {/* Larger Avatar Container (144x144) */}
+              <div className="relative group flex-shrink-0">
                 <input 
                   type="file" 
                   ref={fileInputRef} 
@@ -211,52 +264,47 @@ export default function SettingsPage() {
                   accept="image/*" 
                   className="hidden" 
                 />
-                <div className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-1 shadow-[0_0_25px_rgba(16,185,129,0.3)] relative overflow-hidden">
-                  <div className="w-full h-full rounded-[14px] bg-[#0B0F14] flex items-center justify-center overflow-hidden">
+                
+                <div className="w-36 h-36 rounded-3xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-1 shadow-[0_0_30px_rgba(16,185,129,0.35)] relative overflow-hidden">
+                  <div className="w-full h-full rounded-[22px] bg-[#0B0F14] flex items-center justify-center overflow-hidden">
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="Avatar Sales" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-3xl font-black text-emerald-400">
+                      <span className="text-4xl font-black text-emerald-400">
                         {formData.fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'SE'}
                       </span>
                     )}
                   </div>
                 </div>
 
-                {/* Camera Overlay Button */}
+                {/* Single Camera Overlay Button (Primary Trigger) */}
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  title="Upload Foto Profil"
-                  className="absolute bottom-0 right-0 p-2 bg-emerald-500 text-slate-900 hover:bg-emerald-400 rounded-xl shadow-lg transition-transform hover:scale-110 border border-slate-900"
+                  title="Upload / Ubah Foto Profil"
+                  className="absolute -bottom-1 -right-1 p-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 rounded-2xl shadow-xl transition-transform hover:scale-110 border-2 border-[#0B0F14] flex items-center justify-center"
                 >
-                  <Camera size={16} />
+                  <Camera size={20} />
                 </button>
               </div>
 
+              {/* User Info & Hapus Foto Action */}
               <div className="text-center sm:text-left flex-1">
-                <h3 className="text-xl font-bold text-white">{formData.fullName}</h3>
-                <p className="text-emerald-400 text-sm font-medium">{formData.title}</p>
-                <p className="text-slate-500 text-xs mt-1">{formData.email}</p>
+                <h3 className="text-2xl font-bold text-white tracking-tight">{formData.fullName}</h3>
+                <p className="text-emerald-400 text-base font-semibold mt-0.5">{formData.title}</p>
+                <p className="text-slate-400 text-sm mt-1">{formData.email}</p>
 
-                <div className="mt-3 flex items-center justify-center sm:justify-start gap-2">
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold rounded-lg border border-white/10 transition-colors"
-                  >
-                    Ubah Foto
-                  </button>
-                  {avatarUrl && (
+                {avatarUrl && (
+                  <div className="mt-4 flex items-center justify-center sm:justify-start">
                     <button
                       type="button"
                       onClick={handleRemoveAvatar}
-                      className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold rounded-lg border border-red-500/20 transition-colors flex items-center gap-1"
+                      className="px-3.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold rounded-lg border border-red-500/20 transition-colors flex items-center gap-1.5"
                     >
-                      <Trash2 size={12} /> Hapus Foto
+                      <Trash2 size={14} /> Hapus Foto Profil
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
 
