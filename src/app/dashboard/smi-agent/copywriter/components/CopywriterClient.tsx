@@ -101,7 +101,7 @@ export default function CopywriterClient() {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs font-semibold text-emerald-500/50 uppercase tracking-widest bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/10 hidden sm:inline-block">
-              Powered by SMI Core
+              Powered by SMI Agent
             </span>
           </div>
         </div>
@@ -112,7 +112,7 @@ export default function CopywriterClient() {
         <div className="max-w-screen-2xl mx-auto h-full flex flex-col lg:flex-row gap-6">
           
           {/* COLUMN 1: Settings Panel (Progressive Disclosure) */}
-          <div className="w-full lg:w-[350px] flex-shrink-0 flex flex-col gap-5 overflow-y-auto pr-2 custom-scrollbar">
+          <div className="w-full lg:w-[350px] flex-shrink-0 flex flex-col gap-5 overflow-y-auto pr-2 pb-32 custom-scrollbar">
             <Card className="bg-[#0B0F14] border border-white/5 p-5 shadow-xl">
               <h2 className="text-sm font-bold text-white uppercase tracking-wider mb-5 flex items-center gap-2">
                 <Target size={16} className="text-emerald-400" />
@@ -316,59 +316,6 @@ export default function CopywriterClient() {
                   </p>
                 </div>
               )}
-            </Card>
-          </div>
-
-          {/* COLUMN 3: Knowledge Base & Context (Information Panel) */}
-          <div className="w-full lg:w-[320px] flex-shrink-0 flex flex-col gap-5 overflow-y-auto pr-2 custom-scrollbar hidden xl:flex">
-            <Card className="bg-gradient-to-br from-[#0B0F14] to-[#111822] border border-emerald-500/10 p-5 shadow-xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-bl-full pointer-events-none"></div>
-              
-              <h2 className="text-sm font-bold text-emerald-400 uppercase tracking-wider mb-5 flex items-center gap-2">
-                <Zap size={16} />
-                SMI Knowledge Base
-              </h2>
-              
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xs font-bold text-slate-300 mb-2">💡 Promo Aktif Saat Ini</h3>
-                  <ul className="space-y-2">
-                    <li className="text-xs text-slate-400 flex items-start gap-2">
-                      <span className="text-emerald-500">•</span> DP 0% (Langsung KPR)
-                    </li>
-                    <li className="text-xs text-slate-400 flex items-start gap-2">
-                      <span className="text-emerald-500">•</span> Free BPHTB & Biaya AJB
-                    </li>
-                    <li className="text-xs text-slate-400 flex items-start gap-2">
-                      <span className="text-emerald-500">•</span> Subsidi Cicilan Bank
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="w-full h-px bg-white/5"></div>
-
-                <div>
-                  <h3 className="text-xs font-bold text-slate-300 mb-2">🏠 Info Klaster Populer</h3>
-                  <div className="bg-white/5 rounded-lg p-3 border border-white/5">
-                    <p className="text-[11px] text-emerald-400 font-bold mb-1">Myzora (Brassia Garden)</p>
-                    <p className="text-xs text-slate-400 leading-relaxed font-light">
-                      Tipe 38/72, 1 Lantai (High Ceiling). Konsep asri modern. Sangat laris untuk milenial.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="w-full h-px bg-white/5"></div>
-
-                <div>
-                  <h3 className="text-xs font-bold text-slate-300 mb-2">🔥 CTA Suggestions</h3>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-2 py-1 bg-white/5 border border-white/10 rounded text-[10px] text-slate-300">Klik link di bio!</span>
-                    <span className="px-2 py-1 bg-white/5 border border-white/10 rounded text-[10px] text-slate-300">Balas chat ini ya</span>
-                    <span className="px-2 py-1 bg-white/5 border border-white/10 rounded text-[10px] text-slate-300">Download E-Brosur</span>
-                    <span className="px-2 py-1 bg-white/5 border border-white/10 rounded text-[10px] text-slate-300">Amankan unit sekarang</span>
-                  </div>
-                </div>
-              </div>
             </Card>
           </div>
 
