@@ -1,8 +1,11 @@
-import React from 'react';
+"use client";
+
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/Card';
-import { Phone, User } from 'lucide-react';
+import { Phone, User, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { Lead } from './LeadsClientPage';
+import { deleteLead } from '@/app/actions/lead-management.actions';
 
 const STAGE_LABELS: Record<string, string> = {
   'New': 'Baru Masuk',
@@ -15,6 +18,20 @@ const STAGE_LABELS: Record<string, string> = {
 };
 
 export default function LeadTable({ leads }: { leads: Lead[] }) {
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus data lead "${name}"?`)) return;
+    setDeletingId(id);
+    const res = await deleteLead(id);
+    if (res.success) {
+      window.location.reload();
+    } else {
+      alert("Gagal menghapus lead: " + res.error);
+    }
+    setDeletingId(null);
+  };
+
   const getStatusColor = (status: string) => {
     switch(status) {
       case 'New': return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
@@ -73,12 +90,22 @@ export default function LeadTable({ leads }: { leads: Lead[] }) {
                     {new Date(lead.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Link 
-                      href={`/dashboard/leads/${lead.id}`}
-                      className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-semibold transition-colors opacity-0 group-hover:opacity-100 border border-emerald-500/20"
-                    >
-                      Buka Detail
-                    </Link>
+                    <div className="flex items-center justify-end gap-2">
+                      <Link 
+                        href={`/dashboard/leads/${lead.id}`}
+                        className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-semibold transition-colors border border-emerald-500/20"
+                      >
+                        Detail
+                      </Link>
+                      <button 
+                        onClick={() => handleDelete(lead.id, lead.name || 'Prospek')}
+                        disabled={deletingId === lead.id}
+                        title="Hapus Lead"
+                        className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors border border-red-500/20 disabled:opacity-50"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))

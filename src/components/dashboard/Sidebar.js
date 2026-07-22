@@ -2,18 +2,27 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, Building2, LogOut, Search, Bell, Link as LinkIcon } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { LayoutDashboard, Users, Building2, LogOut, Link as LinkIcon, Settings } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 const navItems = [
   { name: 'Beranda', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Lead Inbox', href: '/dashboard/leads', icon: Users },
   { name: 'Campaign Links', href: '/dashboard/campaigns', icon: LinkIcon },
   { name: 'Ketersediaan Unit', href: '/dashboard/units', icon: Building2 },
+  { name: 'Pengaturan Akun', href: '/dashboard/settings', icon: Settings },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const supabase = createClient()
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
 
   return (
     <aside className="w-64 h-screen bg-[#0B0F14] border-r border-white/10 flex flex-col hidden md:flex sticky top-0">
@@ -42,7 +51,7 @@ export function Sidebar() {
           Main Menu
         </div>
         {navItems.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+          const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(`${item.href}/`))
           
           return (
             <Link
@@ -71,7 +80,10 @@ export function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-white/10">
-        <button className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 w-full">
+        <button 
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 w-full"
+        >
           <LogOut size={18} />
           <span>Keluar</span>
         </button>

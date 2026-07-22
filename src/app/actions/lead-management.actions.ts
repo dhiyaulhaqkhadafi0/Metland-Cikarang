@@ -172,3 +172,24 @@ export async function getLeadActivities(leadId: string) {
     
   return { data: data || [], error };
 }
+
+// ==========================================
+// 5. LEAD DELETION
+// ==========================================
+export async function deleteLead(leadId: string) {
+  try {
+    const supabase = await createClient();
+    // Hapus data relasi terlebih dahulu agar tidak constraint error
+    await supabase.from('lead_activities').delete().eq('lead_id', leadId);
+    await supabase.from('lead_notes').delete().eq('lead_id', leadId);
+    await supabase.from('lead_reminders').delete().eq('lead_id', leadId);
+
+    const { error } = await supabase.from('leads').delete().eq('id', leadId);
+    if (error) throw new Error(error.message);
+
+    return { success: true };
+  } catch (err: any) {
+    console.error("Error deleting lead:", err);
+    return { success: false, error: err.message };
+  }
+}

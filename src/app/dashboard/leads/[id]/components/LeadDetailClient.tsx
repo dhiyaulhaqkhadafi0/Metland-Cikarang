@@ -4,9 +4,10 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { 
   User, Phone, MapPin, Building2, Calendar, 
-  Clock, DollarSign, Activity, FileText, Bell, MessageCircle, Send, CheckCircle2, Circle
+  Clock, DollarSign, Activity, FileText, Bell, MessageCircle, Send, CheckCircle2, Circle, Trash2
 } from 'lucide-react';
-import { updateLeadStatus, addLeadNote, createReminder, toggleReminderStatus } from '@/app/actions/lead-management.actions';
+import { useRouter } from 'next/navigation';
+import { updateLeadStatus, addLeadNote, createReminder, toggleReminderStatus, deleteLead } from '@/app/actions/lead-management.actions';
 
 const STAGES = ['New', 'Contacted', 'Survey', 'Negotiation', 'Booked', 'Closing', 'Lost'];
 
@@ -31,12 +32,26 @@ export default function LeadDetailClient({
   notes: any[];
   reminders: any[];
 }) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('timeline');
   const [currentStatus, setCurrentStatus] = useState(lead.status || 'New');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [noteText, setNoteText] = useState('');
   const [reminderDate, setReminderDate] = useState('');
   const [reminderDesc, setReminderDesc] = useState('');
+
+  const handleDeleteLead = async () => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus data lead "${lead.name || 'Prospek'}" secara permanen?`)) return;
+    setIsDeleting(true);
+    const res = await deleteLead(lead.id);
+    if (res.success) {
+      router.push('/dashboard/leads');
+    } else {
+      alert("Gagal menghapus lead: " + res.error);
+      setIsDeleting(false);
+    }
+  };
 
   const handleAddNote = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,6 +115,13 @@ export default function LeadDetailClient({
             >
               <MessageCircle size={18} /> WhatsApp
             </a>
+            <button 
+              onClick={handleDeleteLead}
+              disabled={isDeleting}
+              className="px-4 py-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 font-semibold rounded-lg flex items-center gap-2 transition-colors border border-red-500/20 disabled:opacity-50"
+            >
+              <Trash2 size={18} /> Hapus Lead
+            </button>
           </div>
         </div>
 
