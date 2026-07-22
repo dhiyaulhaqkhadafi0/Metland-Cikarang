@@ -32,7 +32,14 @@ export function TopBar({ isCollapsed, onToggleCollapse }: { isCollapsed?: boolea
         
         const finalName = formattedName || 'Sales Executive'
         setDisplayName(finalName)
-        setAvatarUrl(user.user_metadata?.avatar_url || null)
+        
+        // Read avatar exclusively from localStorage to avoid 494 Vercel header error
+        const localAvatar = localStorage.getItem('sales_avatar_url')
+        if (localAvatar) {
+          setAvatarUrl(localAvatar)
+        } else {
+          setAvatarUrl(null)
+        }
         
         const parts = finalName.trim().split(' ')
         const inits = parts.length > 1 ? (parts[0][0] + parts[1][0]) : (parts[0][0] || 'S')

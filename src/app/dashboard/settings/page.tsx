@@ -19,7 +19,7 @@ const compressImage = (file: File): Promise<string> => {
       URL.revokeObjectURL(url);
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      const maxDim = 180;
+      const maxDim = 400;
       let width = img.width;
       let height = img.height;
 
@@ -38,7 +38,7 @@ const compressImage = (file: File): Promise<string> => {
       canvas.width = width;
       canvas.height = height;
       ctx?.drawImage(img, 0, 0, width, height);
-      resolve(canvas.toDataURL('image/jpeg', 0.7));
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
     };
     img.onerror = (err) => {
       URL.revokeObjectURL(url);
@@ -87,15 +87,19 @@ export default function SettingsPage() {
 
         const initialRef = `REF-${(user.email ? user.email.split('@')[0] : 'SALES').toUpperCase()}`;
 
-        // Auto-fix: if avatar_url is uncompressed (>4KB), reset it to prevent 494 REQUEST_HEADER_TOO_LARGE
-        const rawAvatar = user.user_metadata?.avatar_url || null;
-        if (rawAvatar && rawAvatar.length > 4000) {
+        const initialRef = `REF-${(user.email ? user.email.split('@')[0] : 'SALES').toUpperCase()}`;
+
+        // Auto-fix: if avatar_url is in user_metadata, reset it immediately to prevent future 494 errors
+        if (user.user_metadata?.avatar_url) {
           await supabase.auth.updateUser({
             data: { avatar_url: null }
           });
-          setAvatarUrl(null);
-        } else {
-          setAvatarUrl(rawAvatar);
+        }
+        
+        // Load avatar from localStorage instead of Supabase cookie metadata
+        const localAvatar = localStorage.getItem('sales_avatar_url');
+        if (localAvatar) {
+          setAvatarUrl(localAvatar);
         }
 
         setFormData(prev => ({
@@ -124,10 +128,9 @@ export default function SettingsPage() {
       const compressedData = await compressImage(file);
       setAvatarUrl(compressedData);
       
-      // Persist lightweight compressed image to Supabase User Metadata (<1.5KB)
-      await supabase.auth.updateUser({
-        data: { avatar_url: compressedData }
-      });
+      // Persist lightweight compressed image to localStorage exclusively to bypass Supabase cookie limits
+      localStorage.setItem('sales_avatar_url', compressedData);
+      
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 3000);
     } catch (err) {
@@ -142,9 +145,7 @@ export default function SettingsPage() {
     setAvatarUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
     
-    await supabase.auth.updateUser({
-      data: { avatar_url: null }
-    });
+    localStorage.removeItem('sales_avatar_url');
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 3000);
   };
@@ -160,8 +161,7 @@ export default function SettingsPage() {
           full_name: formData.fullName,
           phone: formData.phone,
           ref_code: formData.refCode,
-          wa_number: formData.waNumber,
-          avatar_url: avatarUrl
+          wa_number: formData.waNumber
         }
       });
 
