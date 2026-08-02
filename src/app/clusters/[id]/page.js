@@ -126,28 +126,28 @@ const brassiaTypes = {
     fasad: "/cluster brassia-garden-new/Fasad Myzora 33 72.jpg", denah: "/cluster brassia-garden-new/denah Myzora 33 72.jpg",
     fasilitasImage: "/cluster brassia-garden-new/fasilitas 33 72.png",
     stock: "Sisa 5 Unit", statusColor: "text-emerald-400",
-    siteplan: "/cluster brassia-garden-new/Update Stock Myzora.jpeg"
+    siteplan: "/cluster brassia-garden-new/Update stock Myzoraa.jpeg"
   },
   "myzora-45": { 
     price: "Mulai Rp 750 Juta", lt: "72m²", lb: "45m²", bed: "3", bath: "1", carport: "1", listrik: "2200 Watt",
     fasad: "/cluster brassia-garden-new/fasad Myzora 45 72.jpeg", denah: "/cluster brassia-garden-new/denah myzora 45 72.png",
     fasilitasImage: "/cluster brassia-garden-new/fasilitas 45 72.png",
     stock: "Sisa 2 Unit", statusColor: "text-orange-400",
-    siteplan: "/cluster brassia-garden-new/Update Stock Myzora.jpeg"
+    siteplan: "/cluster brassia-garden-new/Update stock Myzoraa.jpeg"
   },
   "myzora-56": { 
     price: "Mulai Rp 992 Juta", lt: "84m²", lb: "56m²", bed: "3", bath: "2", carport: "1", listrik: "2200 Watt",
     fasad: "/cluster brassia-garden-new/fasad myzora 56 84.jpg", denah: "/cluster brassia-garden-new/denah myzora 56 84.png",
     fasilitasImage: "/cluster brassia-garden-new/fasilitas 56 84.png",
     stock: "Sold Out", statusColor: "text-red-400",
-    siteplan: "/cluster brassia-garden-new/Update Stock Myzora.jpeg"
+    siteplan: "/cluster brassia-garden-new/Update stock Myzoraa.jpeg"
   },
   "myzora-77": { 
     price: "Mulai Rp 1.2 Miliar", lt: "98m²", lb: "77m²", bed: "4", bath: "2", carport: "2", listrik: "2200 Watt",
     fasad: "/cluster brassia-garden-new/fasad myzora 77 98.jpg", denah: "/cluster brassia-garden-new/denah myzora 77 98.png",
     fasilitasImage: "/cluster brassia-garden-new/Fasilitas 77 98.png",
     stock: "Last Unit", statusColor: "text-red-500",
-    siteplan: "/cluster brassia-garden-new/Update Stock Myzora.jpeg"
+    siteplan: "/cluster brassia-garden-new/Update stock Myzoraa.jpeg"
   },
   "ellyra-56-84": { 
     price: "Mulai Rp 1.1 Miliar", lt: "84m²", lb: "56m²", bed: "2", bath: "2", carport: "1",
@@ -195,14 +195,14 @@ const deroraTypes = {
     fasad: "/cluster avesa garden/DERORA/fasad derora 33 72.jpg", denah: "/cluster avesa garden/DERORA/denah unit derora 33 72.png",
     fasilitasImage: null,
     stock: null, statusColor: "text-emerald-400",
-    siteplan: null
+    siteplan: "/cluster avesa garden/DERORA/Update stock deroraa.jpeg"
   },
   "derora-59": { 
     price: "Rp 1.05 Miliar", lt: "84m²", lb: "59m²", bed: "3", bath: "2", carport: "1", listrik: "2200 Watt",
     fasad: "/cluster avesa garden/DERORA/fasad derora 59 84.jpg", denah: "/cluster avesa garden/DERORA/denah unit derora 59 84.png",
     fasilitasImage: null,
     stock: null, statusColor: "text-emerald-400",
-    siteplan: null
+    siteplan: "/cluster avesa garden/DERORA/Update stock deroraa.jpeg"
   }
 };
 
@@ -229,14 +229,14 @@ const westonTypes = {
     fasad: "/RUKO WESTON GATEWAY/galeri_cluster7_693135f9dd540 (2).jpg", denah: null,
     fasilitasImage: null,
     stock: null, statusColor: "text-red-500",
-    siteplan: null
+    siteplan: "/RUKO WESTON GATEWAY/Update stock ruko westonn.jpeg"
   },
   "weston-100": { 
     price: "Rp 1.415 Miliar", lt: "100m²", lb: "60m²", bed: "-", bath: "2", carport: "2", listrik: "2200 Watt",
     fasad: "/RUKO WESTON GATEWAY/galeri_cluster7_6931360434110 (2).jpg", denah: null,
     fasilitasImage: null,
     stock: null, statusColor: "text-red-500",
-    siteplan: null
+    siteplan: "/RUKO WESTON GATEWAY/Update stock ruko westonn.jpeg"
   }
 };
 
