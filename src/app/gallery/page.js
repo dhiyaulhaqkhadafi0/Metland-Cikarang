@@ -1,4 +1,5 @@
 import GalleryHero from "@/components/organisms/GalleryHero";
+import GalleryMain from "@/components/organisms/GalleryMain";
 import GalleryPromo from "@/components/organisms/GalleryPromo";
 import GalleryVirtualTour from "@/components/organisms/GalleryVirtualTour";
 import GalleryProgress from "@/components/organisms/GalleryProgress";
@@ -15,6 +16,7 @@ export default function GalleryPage() {
   return (
     <main className="bg-dark-bg min-h-screen">
       <GalleryHero />
+      <GalleryMain />
       <GalleryVirtualTour />
       <GalleryPromo />
       <GalleryProgress />
