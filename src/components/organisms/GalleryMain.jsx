@@ -280,6 +280,7 @@ const galleryData = [
 ];
 
 export default function GalleryMain() {
+  const containerRef = useRef(null);
   const [activeImage, setActiveImage] = useState(null);
 
   // Helper to generate full URL based on R2 preference
