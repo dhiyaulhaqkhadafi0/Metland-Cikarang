@@ -119,7 +119,7 @@ function VideoCard({ item, index }) {
       className="flex flex-col gap-4 group"
     >
       <div className="relative w-full aspect-[9/16] rounded-3xl overflow-hidden bg-dark-card border border-white/5 shadow-2xl hover:shadow-[0_0_40px_rgba(16,185,129,0.15)] transition-shadow duration-500">
-        <CustomVideoPlayer src={src} title={item.title} />
+        <CustomVideoPlayer src={src} fallbackSrc={localVideoUrl} title={item.title} />
       </div>
 
       <div className="px-2">

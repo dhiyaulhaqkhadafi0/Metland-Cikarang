@@ -4,12 +4,14 @@ import { useRef, useState, useEffect } from "react";
 import { Play, Pause, Volume2, VolumeX, Maximize, Settings2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function CustomVideoPlayer({ src, title }) {
+export default function CustomVideoPlayer({ src, fallbackSrc, title }) {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentSrc, setCurrentSrc] = useState(src);
+  const [hasFallenBack, setHasFallenBack] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [volume, setVolume] = useState(0); // 0 because muted initially
   const [showControls, setShowControls] = useState(true);
@@ -126,11 +128,18 @@ export default function CustomVideoPlayer({ src, title }) {
     >
       <video
         ref={videoRef}
-        src={`${src}#t=0.1`}
+        src={`${currentSrc}#t=0.1`}
         className={`w-full h-full ${isFullscreen ? 'object-contain' : 'object-cover'}`}
         onTimeUpdate={handleTimeUpdate}
         onEnded={() => setIsPlaying(false)}
-        onError={(e) => console.error('Video load error:', src, e.target.error)}
+        onError={(e) => {
+          console.error('Video load error:', currentSrc, e.target.error);
+          if (fallbackSrc && !hasFallenBack && currentSrc !== fallbackSrc) {
+            console.log('Falling back to local video:', fallbackSrc);
+            setCurrentSrc(fallbackSrc);
+            setHasFallenBack(true);
+          }
+        }}
         playsInline
         preload="metadata"
         muted={isMuted}
