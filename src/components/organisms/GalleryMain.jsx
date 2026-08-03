@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useRef } from "react";`nimport { useScroll, useTransform } from "framer-motion";
+import { useState, useRef } from "react";
+import { useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import { Maximize2, Sparkles } from "lucide-react";
 import ImageLightbox from "../molecules/ImageLightbox";
