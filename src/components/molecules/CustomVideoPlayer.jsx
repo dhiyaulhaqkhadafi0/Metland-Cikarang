@@ -19,11 +19,16 @@ export default function CustomVideoPlayer({ src, title }) {
 
   let hideControlsTimeout = null;
 
-  const togglePlay = (e) => {
+  const togglePlay = async (e) => {
     e.stopPropagation();
     if (videoRef.current.paused) {
-      videoRef.current.play();
-      setIsPlaying(true);
+      try {
+        await videoRef.current.play();
+        setIsPlaying(true);
+      } catch (err) {
+        console.error('Video play failed:', err);
+        setIsPlaying(false);
+      }
     } else {
       videoRef.current.pause();
       setIsPlaying(false);

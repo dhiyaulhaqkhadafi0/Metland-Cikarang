@@ -12,76 +12,70 @@ const videoArchive = [
   {
     id: 1,
     month: "Juni 2026",
-    filename: "Akses baru, mobilitas makin mudah. Bayangkan perjalanan yang lebih praktis dengan hadirnya jemba.mp4",
+    filename: "progress-akses-baru.mp4",
     title: "Akses Baru Mobilitas Mudah",
     desc: "Bayangkan perjalanan yang lebih praktis dengan hadirnya akses baru."
   },
   {
     id: 2,
     month: "Juni 2026",
-    filename: "Brassia Garden sedang dalam proses pembangunan. Ikuti perkembangannya dan temukan detailnya di l.mp4",
+    filename: "progress-brassia-garden.mp4",
     title: "Progress Brassia Garden",
     desc: "Ikuti perkembangannya dan temukan detail eksklusifnya."
   },
   {
     id: 3,
     month: "Juni 2026",
-    filename: "Dari akses kawasan yang mudah, area olahraga, tempat WFA, hingga playground untuk si kecil, semu.mp4",
+    filename: "progress-fasilitas-kawasan.mp4",
     title: "Fasilitas Kawasan Terpadu",
     desc: "Dari area olahraga, tempat WFA, hingga playground untuk si kecil."
   },
   {
     id: 4,
     month: "Juni 2026",
-    filename: "Kesempatan terakhir untuk memiliki hunian impian di Myzora! Tipe 56 dan Tipe 45 sudah SOLD OUT, .mp4",
+    filename: "progress-myzora-hunian.mp4",
     title: "Hunian Impian Myzora",
     desc: "Kesempatan terakhir! Tipe 56 dan 45 SOLD OUT. Segera miliki unit Anda."
   },
   {
     id: 5,
     month: "Juni 2026",
-    filename: "Myzora bentar lagi jadi! Show unit Tipe 77 segera hadir untuk kamu rasakan langsung di 2026. Pan.mp4",
+    filename: "progress-myzora-tipe77.mp4",
     title: "Show Unit Myzora Tipe 77",
     desc: "Segera hadir untuk Anda rasakan langsung pengalaman ruangannya."
   },
   {
     id: 6,
     month: "Juni 2026",
-    filename: "Pembangunan Jembatan Metland Cikarang terus berjalan dengan progres yang semakin nyata. Nantinya.mp4",
+    filename: "progress-jembatan.mp4",
     title: "Pembangunan Jembatan",
     desc: "Terus berjalan dengan progres yang semakin nyata di lapangan."
   },
   {
     id: 7,
     month: "Juni 2026",
-    filename: "Rumah impianmu semakin dekat jadi kenyataan!Progress pembangunan Myzora Tipe 45 terus berjalan d.mp4",
+    filename: "progress-myzora-tipe45.mp4",
     title: "Progress Myzora Tipe 45",
     desc: "Rumah impian Anda semakin dekat menjadi kenyataan."
   },
   {
     id: 8,
     month: "Juni 2026",
-    filename: "Semakin dekat, semakin terhubung. 🌉Update progress jembatan penghubung Metland Cikarang – Metla.mp4",
+    filename: "progress-jembatan-penghubung.mp4",
     title: "Jembatan Penghubung Metland",
     desc: "Semakin dekat, semakin terhubung menuju kemudahan akses."
   },
   {
     id: 9,
     month: "Juni 2026",
-    filename: "Setiap dinding yang berdiri hari ini akan menjadi saksi cerita keluarga di masa depan. 🤍Myzora .mp4",
+    filename: "progress-cerita-keluarga-myzora.mp4",
     title: "Cerita Keluarga Myzora",
     desc: "Setiap dinding yang berdiri hari ini akan menjadi saksi cerita esok hari."
   }
 ];
 
 function VideoCard({ item, index }) {
-  // Smart Fallback Logic handled inside CustomVideoPlayer wrapper if needed, 
-  // but here we just pass the most reliable URL first.
-  const r2VideoUrl = R2_URL ? `${R2_URL}/${encodeURIComponent(item.filename)}` : null;
-  const localVideoUrl = encodeURI(`/gallery umum/video update progress/JUNI 2026/${item.filename}`);
-  
-  // Custom video player will fallback automatically if implemented, or we just rely on local for absolute guarantee during dev.
-  const src = localVideoUrl; // Using local to guarantee it works flawlessly since R2 setup might still be propagating.
+  const src = `/gallery umum/video update progress/JUNI 2026/${item.filename}`;
 
   return (
     <motion.div
