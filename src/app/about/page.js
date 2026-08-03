@@ -92,24 +92,30 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <div className="relative">
-              {/* Abstract Glass Shape replacing image */}
-              <div className="aspect-[4/5] rounded-[3rem] overflow-hidden relative bg-gradient-to-br from-[#111] to-[#0a0a0b] border border-white/10 shadow-2xl p-8 flex flex-col justify-end">
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
-                <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-emerald-500/30 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute bottom-1/4 right-1/4 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-700" />
+            <div className="relative group">
+              <div className="aspect-[4/5] rounded-[3rem] overflow-hidden relative shadow-2xl p-8 flex flex-col justify-end border border-white/10">
+                {/* Image Background */}
+                <div className="absolute inset-0 w-full h-full">
+                  <img 
+                    src="/cluster avesa garden/CANARY/Canary Utama.jpg" 
+                    alt="Metland Cikarang Premium Living" 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  />
+                  {/* Overlay for better text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                </div>
                 
-                <div className="relative z-10 backdrop-blur-xl bg-black/40 border border-white/10 p-6 rounded-2xl">
+                <div className="relative z-10 backdrop-blur-xl bg-black/40 border border-white/10 p-6 rounded-2xl group-hover:-translate-y-2 transition-transform duration-500">
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                      <Shield className="w-6 h-6 text-emerald-400" />
+                    <div className="w-12 h-12 rounded-full bg-emerald-500/80 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.5)]">
+                      <Shield className="w-6 h-6 text-white" />
                     </div>
                     <div>
                       <h4 className="text-white font-medium">Dedikasi Kualitas</h4>
-                      <p className="text-xs text-gray-400">Sejak 1994</p>
+                      <p className="text-xs text-emerald-300">Sejak 1994</p>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-300 font-light italic">
+                  <p className="text-sm text-gray-200 font-light italic leading-relaxed">
                     "Komitmen kami adalah menghadirkan ruang hidup yang menginspirasi setiap generasi untuk berkembang secara berkelanjutan."
                   </p>
                 </div>
