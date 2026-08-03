@@ -71,13 +71,41 @@ const videoArchive = [
     filename: "Setiap dinding yang berdiri hari ini akan menjadi saksi cerita keluarga di masa depan. 🤍Myzora .mp4",
     title: "Cerita Keluarga Myzora",
     desc: "Setiap dinding yang berdiri hari ini akan menjadi saksi cerita esok hari."
+  },
+  {
+    id: 10,
+    month: "Juli 2026",
+    filename: "Masih takut ambil rumah karena terbatasnya akses transportasi umumTenang aja, pengembangan jal.mp4",
+    title: "Akses Transportasi Umum",
+    desc: "Masih takut ambil rumah karena terbatasnya akses transportasi umum? Tenang saja."
+  },
+  {
+    id: 11,
+    month: "Juli 2026",
+    filename: "Myzora tinggal last unit. Elyra baru dibuka. Jogging track, musholla, gym, clubhouse, WiFi selur.mp4",
+    title: "Fasilitas Lengkap Elyra",
+    desc: "Jogging track, musholla, gym, clubhouse, WiFi seluruh area."
+  },
+  {
+    id: 12,
+    month: "Juli 2026",
+    filename: "Progress Update jembatan penghubung - 24 Juli 2026 Pembangunan jembatan penghubung Desa Wanajaya (1).mp4",
+    title: "Update Jembatan Wanajaya",
+    desc: "Progress pembangunan jembatan penghubung Desa Wanajaya per 24 Juli 2026."
+  },
+  {
+    id: 13,
+    month: "Juli 2026",
+    filename: "Semua fasilitas lengkap ada di sini untuk kenyamanan hidupmu sehari-hari. Yuk, intip berbagai ke.mp4",
+    title: "Kenyamanan Hidup Sehari-hari",
+    desc: "Semua fasilitas lengkap ada di sini untuk kenyamanan hidupmu sehari-hari."
   }
 ];
 
 function VideoCard({ item, index }) {
   // Use R2 URL if available, assuming files are in the 'video' folder on R2
   const r2VideoUrl = R2_URL ? `${R2_URL}/video/${encodeURIComponent(item.filename)}` : null;
-  const localVideoUrl = encodeURI(`/gallery umum/video update progress/JUNI 2026/${item.filename}`);
+  const localVideoUrl = encodeURI(`/gallery umum/video update progress/${item.month.toUpperCase()}/${item.filename}`);
   
   // Prefer R2 URL to avoid Vercel size limits and bandwidth issues
   const src = r2VideoUrl || localVideoUrl;
@@ -107,7 +135,7 @@ function VideoCard({ item, index }) {
 
 export default function GalleryProgress() {
   const [activeFilter, setActiveFilter] = useState("Semua");
-  const filters = ["Semua", "Juni 2026"];
+  const filters = ["Semua", "Juni 2026", "Juli 2026"];
 
   const filteredVideos = activeFilter === "Semua" 
     ? videoArchive 
