@@ -126,13 +126,15 @@ export default function CustomVideoPlayer({ src, title }) {
     >
       <video
         ref={videoRef}
-        src={src}
+        src={`${src}#t=0.1`}
         className={`w-full h-full ${isFullscreen ? 'object-contain' : 'object-cover'}`}
         onTimeUpdate={handleTimeUpdate}
         onEnded={() => setIsPlaying(false)}
+        onError={(e) => console.error('Video load error:', src, e.target.error)}
         playsInline
         preload="metadata"
-        muted={isMuted} // Muted by default to allow some browsers to autoplay or to prevent sudden loud noises
+        muted={isMuted}
+        type="video/mp4"
       />
 
       {/* Central Play/Pause Big Button */}
