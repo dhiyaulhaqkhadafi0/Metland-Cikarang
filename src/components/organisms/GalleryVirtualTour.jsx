@@ -101,11 +101,11 @@ const tours = [
     // Avesa Garden - Canary & Derora
     { id: 1, title: "Fasad Canary", type: "Avesa Garden", imageSrc: "/cluster avesa garden/CANARY/galeri_cluster4_68a28b1f778ed.jpg", delay: 0 },
     { id: 2, title: "Interior Canary", type: "Avesa Garden", imageSrc: "/cluster avesa garden/CANARY/galeri_cluster4_68a28b2e781bc.jpg", delay: 0.2 },
-    { id: 3, title: "Tipe Canary Minimalis", type: "Avesa Garden", imageSrc: "/cluster avesa garden/CANARY/galeri_cluster4_68a28b4e39670.jpg", delay: 0.4 },
+    { id: 3, title: "Tipe Canary Minimalis", type: "Avesa Garden", imageSrc: "/cluster avesa garden/CANARY/Canary Utama.jpg", delay: 0.4 },
     { id: 4, title: "Fasad Utama Derora", type: "Avesa Garden", imageSrc: "/cluster avesa garden/DERORA/galeri_cluster2_68a174f24c287.jpg", delay: 0 },
     { id: 5, title: "Derora Tipe 59/84", type: "Avesa Garden", imageSrc: "/cluster avesa garden/DERORA/galeri_cluster2_68a1de03090b3.jpg", delay: 0.2 },
-    { id: 6, title: "Fasad Modern Derora", type: "Avesa Garden", imageSrc: "/cluster avesa garden/DERORA/galeri_cluster2_68a1de1ad5125.jpg", delay: 0.4 },
-    { id: 7, title: "Eksterior Tipe Premium", type: "Avesa Garden", imageSrc: "/cluster avesa garden/DERORA/galeri_cluster2_68a1de28211a8.jpg", delay: 0 },
+    { id: 6, title: "Fasad Modern Derora", type: "Avesa Garden", imageSrc: "/cluster avesa garden/DERORA/fasad derora 33 72.jpg", delay: 0.4 },
+    { id: 7, title: "Eksterior Tipe Premium", type: "Avesa Garden", imageSrc: "/cluster avesa garden/DERORA/fasad derora 59 84.jpg", delay: 0 },
     { id: 8, title: "Lingkungan Asri Derora", type: "Avesa Garden", imageSrc: "/cluster avesa garden/DERORA/galeri_cluster2_68a1de3b291f4.jpg", delay: 0.2 },
     
     // Brassia Garden (Myzora)

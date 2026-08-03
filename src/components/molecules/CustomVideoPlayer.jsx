@@ -126,6 +126,7 @@ export default function CustomVideoPlayer({ src, title }) {
         onTimeUpdate={handleTimeUpdate}
         onEnded={() => setIsPlaying(false)}
         playsInline
+        preload="metadata"
         muted={isMuted} // Muted by default to allow some browsers to autoplay or to prevent sudden loud noises
       />
 
