@@ -6,6 +6,7 @@ import GalleryProgress from "@/components/organisms/GalleryProgress";
 import GalleryEvents from "@/components/organisms/GalleryEvents";
 import GalleryStories from "@/components/organisms/GalleryStories";
 import FinalCTASection from "@/components/organisms/FinalCTASection";
+import ScrollToTop from "@/components/atoms/ScrollToTop";
 
 export const metadata = {
   title: "Gallery & Experience Center | Metland Cikarang",
@@ -23,6 +24,7 @@ export default function GalleryPage() {
       <GalleryEvents />
       <GalleryStories />
       <FinalCTASection />
+      <ScrollToTop />
     </main>
   );
 }
