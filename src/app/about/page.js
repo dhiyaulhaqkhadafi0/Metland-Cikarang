@@ -97,8 +97,8 @@ export default function AboutPage() {
                 {/* Image Background */}
                 <div className="absolute inset-0 w-full h-full">
                   <img 
-                    src="/cluster avesa garden/CANARY/Canary Utama.jpg" 
-                    alt="Metland Cikarang Premium Living" 
+                    src="/brassia-77.jpg" 
+                    alt="Brassia Garden Tipe 77" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
                   {/* Overlay for better text readability */}
