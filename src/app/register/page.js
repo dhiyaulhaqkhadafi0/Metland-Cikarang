@@ -21,7 +21,8 @@ export default function RegisterPage() {
     fullName: '',
     email: '',
     password: '',
-    role: 'sales'
+    role: 'sales',
+    accessCode: ''
   })
 
   const handleChange = (e) => {
@@ -32,6 +33,14 @@ export default function RegisterPage() {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
+
+    // Validasi Kode Akses Internal
+    const SECRET_ACCESS_CODE = 'METLAND-INTERNAL-2026'
+    if (formData.accessCode !== SECRET_ACCESS_CODE) {
+      setError('Kode akses tidak valid. Pendaftaran dibatalkan. Hubungi tim Management untuk mendapatkan akses.')
+      setIsLoading(false)
+      return
+    }
 
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -108,6 +117,11 @@ export default function RegisterPage() {
         <p className="text-emerald-50 mt-2 opacity-90">Mulai kelola prospek Metland Cikarang Anda.</p>
       </div>
 
+      <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 text-amber-200 rounded-lg text-sm">
+        <strong className="text-amber-400 block mb-1">Pemberitahuan Penting</strong>
+        Platform ini eksklusif hanya untuk akses <b>Tim Internal (Sales & Management) Metland Cikarang</b>, bukan untuk publik.
+      </div>
+
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
           {error}
@@ -178,6 +192,21 @@ export default function RegisterPage() {
           value={formData.password}
           onChange={handleChange}
         />
+        
+        <div className="space-y-1">
+          <Input 
+            label="Kode Akses Internal (Passcode)" 
+            name="accessCode"
+            type="password" 
+            placeholder="Ketik kode dari Management" 
+            required 
+            value={formData.accessCode}
+            onChange={handleChange}
+          />
+          <p className="text-xs text-emerald-400/80">
+            Akses pendaftaran hanya untuk staf internal Metland.
+          </p>
+        </div>
 
         <Button type="submit" className="w-full" isLoading={isLoading}>
           Buat Akun

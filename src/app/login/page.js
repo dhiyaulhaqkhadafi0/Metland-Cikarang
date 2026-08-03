@@ -133,6 +133,11 @@ export default function LoginPage() {
         <p className="text-emerald-50 mt-2 opacity-90">Masukkan email dan password Anda.</p>
       </div>
 
+      <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 text-amber-200 rounded-lg text-sm">
+        <strong className="text-amber-400 block mb-1">Pemberitahuan Penting</strong>
+        Platform ini eksklusif hanya untuk akses <b>Tim Internal (Sales & Management) Metland Cikarang</b>, bukan untuk publik.
+      </div>
+
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm flex items-start gap-3">
           <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
