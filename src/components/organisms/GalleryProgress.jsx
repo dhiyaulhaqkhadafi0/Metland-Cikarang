@@ -75,28 +75,28 @@ const videoArchive = [
   {
     id: 10,
     month: "Juli 2026",
-    filename: "Masih takut ambil rumah karena terbatasnya akses transportasi umumTenang aja, pengembangan jal.mp4",
+    filename: "video-1.mp4",
     title: "Akses Transportasi Umum",
     desc: "Masih takut ambil rumah karena terbatasnya akses transportasi umum? Tenang saja."
   },
   {
     id: 11,
     month: "Juli 2026",
-    filename: "Myzora tinggal last unit. Elyra baru dibuka. Jogging track, musholla, gym, clubhouse, WiFi selur.mp4",
+    filename: "video-2.mp4",
     title: "Fasilitas Lengkap Elyra",
     desc: "Jogging track, musholla, gym, clubhouse, WiFi seluruh area."
   },
   {
     id: 12,
     month: "Juli 2026",
-    filename: "Progress Update jembatan penghubung - 24 Juli 2026 Pembangunan jembatan penghubung Desa Wanajaya (1).mp4",
+    filename: "video-3.mp4",
     title: "Update Jembatan Wanajaya",
     desc: "Progress pembangunan jembatan penghubung Desa Wanajaya per 24 Juli 2026."
   },
   {
     id: 13,
     month: "Juli 2026",
-    filename: "Semua fasilitas lengkap ada di sini untuk kenyamanan hidupmu sehari-hari. Yuk, intip berbagai ke.mp4",
+    filename: "video-4.mp4",
     title: "Kenyamanan Hidup Sehari-hari",
     desc: "Semua fasilitas lengkap ada di sini untuk kenyamanan hidupmu sehari-hari."
   }
