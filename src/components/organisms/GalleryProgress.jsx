@@ -78,7 +78,7 @@ function VideoCard({ item, index }) {
   // Smart Fallback Logic handled inside CustomVideoPlayer wrapper if needed, 
   // but here we just pass the most reliable URL first.
   const r2VideoUrl = R2_URL ? `${R2_URL}/${encodeURIComponent(item.filename)}` : null;
-  const localVideoUrl = `/gallery umum/video update progress/JUNI 2026/${encodeURIComponent(item.filename)}`;
+  const localVideoUrl = encodeURI(`/gallery umum/video update progress/JUNI 2026/${item.filename}`);
   
   // Custom video player will fallback automatically if implemented, or we just rely on local for absolute guarantee during dev.
   const src = localVideoUrl; // Using local to guarantee it works flawlessly since R2 setup might still be propagating.
