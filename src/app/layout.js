@@ -6,6 +6,7 @@ import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { TrackingProvider } from "@/components/smi/TrackingProvider";
+import MetaPixel from "@/components/smi/MetaPixel";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -46,6 +47,7 @@ export default function RootLayout({ children }) {
         </TrackingProvider>
         <Analytics />
         <SpeedInsights />
+        <MetaPixel />
       </body>
     </html>
   );

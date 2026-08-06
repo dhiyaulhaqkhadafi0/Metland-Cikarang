@@ -3,6 +3,7 @@ import SmartPropertyFinder from "@/components/organisms/SmartPropertyFinder";
 import ClusterShowcaseCarousel from "@/components/organisms/ClusterShowcaseCarousel";
 import InvestmentSimulatorSection from "@/components/organisms/InvestmentSimulatorSection";
 import BankPartners from "@/components/organisms/BankPartners";
+import LeadFormCTA from "@/components/organisms/LeadFormCTA";
 import FinalCTASection from "@/components/organisms/FinalCTASection";
 
 export const metadata = {
@@ -22,6 +23,7 @@ export default function Home() {
       <ClusterShowcaseCarousel />
       <InvestmentSimulatorSection />
       <BankPartners />
+      <LeadFormCTA />
       <FinalCTASection />
       <Footer />
     </main>
