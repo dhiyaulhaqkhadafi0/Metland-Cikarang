@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, CheckCircle2, MapPin, Ruler, BedDouble, Bath, CarFront, Video, Wind, Lock, Lightbulb, Sprout, Maximize, Home, Zap, Plus, Minus, Tag, ShieldCheck, Leaf, Smartphone, Users, WashingMachine, Dumbbell } from "lucide-react";
 import Link from "next/link";
@@ -252,6 +252,17 @@ export default function ClusterMicrosite() {
     id === "weston" ? "weston-90" : null
   );
   const [lightboxImage, setLightboxImage] = useState(null);
+  const hasFiredViewContent = useRef(false);
+
+  useEffect(() => {
+    // Only fire ViewContent for Myzora (which is within brassia cluster)
+    if (id === "brassia" && !hasFiredViewContent.current) {
+      if (typeof window !== 'undefined' && window.fbq) {
+        window.fbq('track', 'ViewContent', { content_name: 'Myzora' });
+        hasFiredViewContent.current = true;
+      }
+    }
+  }, [id]);
 
   const activeSpec = activeSpecKey 
     ? (id === "canary" ? canaryTypes[activeSpecKey] : id === "derora" ? deroraTypes[activeSpecKey] : id === "easton" ? eastonTypes[activeSpecKey] : id === "weston" ? westonTypes[activeSpecKey] : brassiaTypes[activeSpecKey]) 

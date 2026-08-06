@@ -44,6 +44,9 @@ export function TrackedWhatsAppButton({
       console.error("Error saat menyimpan tracking:", error);
     } finally {
       // 3. Langsung Redirect ke WhatsApp setelah data dipastikan terkirim
+      if (typeof window !== 'undefined' && window.fbq) {
+        window.fbq('track', 'Contact');
+      }
       const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
       window.open(waUrl, '_blank');
       

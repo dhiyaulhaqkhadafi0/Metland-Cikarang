@@ -2,18 +2,22 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { useEffect, Suspense } from "react";
+import { useEffect, Suspense, useRef } from "react";
 
 const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "1722004259078620"; // Pixel ID from Meta Ads Manager
 
 function MetaPixelLogic() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const lastUrlRef = useRef("");
 
   useEffect(() => {
-    // This fires a PageView event on route change
-    if (typeof window !== 'undefined' && window.fbq) {
-      window.fbq('track', 'PageView');
+    const currentUrl = pathname + searchParams.toString();
+    if (currentUrl !== lastUrlRef.current) {
+      if (typeof window !== 'undefined' && window.fbq) {
+        window.fbq('track', 'PageView');
+        lastUrlRef.current = currentUrl;
+      }
     }
   }, [pathname, searchParams]);
 
