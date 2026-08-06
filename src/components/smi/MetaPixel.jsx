@@ -2,11 +2,11 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 
 const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "YOUR_PIXEL_ID"; // Replace YOUR_PIXEL_ID if you have it
 
-export default function MetaPixel() {
+function MetaPixelLogic() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -17,8 +17,15 @@ export default function MetaPixel() {
     }
   }, [pathname, searchParams]);
 
+  return null;
+}
+
+export default function MetaPixel() {
   return (
     <>
+      <Suspense fallback={null}>
+        <MetaPixelLogic />
+      </Suspense>
       <Script
         id="fb-pixel"
         strategy="afterInteractive"
