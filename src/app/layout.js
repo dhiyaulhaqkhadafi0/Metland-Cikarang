@@ -44,15 +44,14 @@ export default function RootLayout({ children }) {
           src="https://www.googletagmanager.com/gtag/js?id=G-DCZK00KGG6"
           strategy="afterInteractive"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
+        <Script id="google-analytics" strategy="afterInteractive" dangerouslySetInnerHTML={{
+          __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-
             gtag('config', 'G-DCZK00KGG6');
-          `}
-        </Script>
+          `
+        }} />
       </head>
       <body>
         <SchemaMarkup />
