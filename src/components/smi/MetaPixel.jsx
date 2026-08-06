@@ -4,7 +4,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
 import { useEffect, Suspense } from "react";
 
-const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "YOUR_PIXEL_ID"; // Replace YOUR_PIXEL_ID if you have it
+const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "1722004259078620"; // Pixel ID from Meta Ads Manager
 
 function MetaPixelLogic() {
   const pathname = usePathname();
