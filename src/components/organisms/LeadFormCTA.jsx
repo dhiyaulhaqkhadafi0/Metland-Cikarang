@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { User, Phone, CheckCircle2, ArrowRight } from "lucide-react";
-import { submitLead } from "@/app/actions/lead-submit.action";
+import { saveLeadAction } from "@/app/actions/lead.actions";
+import { getTrackingData } from "@/lib/tracking/utmTracker";
 
 export default function LeadFormCTA() {
   const [status, setStatus] = useState("idle"); // 'idle', 'submitting', 'success', 'error'
@@ -15,9 +16,13 @@ export default function LeadFormCTA() {
     setErrorMessage("");
 
     const formData = new FormData(e.target);
+    const trackingData = getTrackingData() || {};
     
     try {
-      const result = await submitLead(formData);
+      const result = await saveLeadAction(trackingData, {
+        name: formData.get("name"),
+        phone: formData.get("phone"),
+      });
       
       if (result.success) {
         setStatus("success");
