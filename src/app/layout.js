@@ -27,7 +27,7 @@ export const metadata = {
   description: "Official Website SMMC Property - Discover Your Dream Home",
   keywords: ["metland cikarang", "properti cikarang", "ruko cikarang", "rumah bekasi", "kpr dp 0%"],
   verification: {
-    google: "60UihOxZnXAUUyTlAuGfU6Ex6zgd7g589lU-NMNWRfw",
+    google: "0_3lKNAlVbXXpbav2HwjHlYxir2PR3TKxrOJ3gtYiOI",
   },
 };
 
