@@ -14,10 +14,10 @@ export async function submitLead(formData: FormData) {
     }
 
     const payload = {
-      name,
+      full_name: name,
       phone,
       status: "baru",
-      utm_source: "website_form",
+      source: "organic",
     };
     
     const { data, error } = await supabase.from('leads').insert([payload]).select();
