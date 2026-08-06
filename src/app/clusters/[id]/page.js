@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, CheckCircle2, MapPin, Ruler, BedDouble, Bath, CarFront, Video, Wind, Lock, Lightbulb, Sprout, Maximize, Home, Zap, Plus, Minus, Tag, ShieldCheck, Leaf, Smartphone, Users, WashingMachine, Dumbbell } from "lucide-react";
+import { ViewContentTracker } from "@/components/smi/ViewContentTracker";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
@@ -252,24 +253,20 @@ export default function ClusterMicrosite() {
     id === "weston" ? "weston-90" : null
   );
   const [lightboxImage, setLightboxImage] = useState(null);
-  const hasFiredViewContent = useRef(false);
-
-  useEffect(() => {
-    // Only fire ViewContent for Myzora (which is within brassia cluster)
-    if (id === "brassia" && !hasFiredViewContent.current) {
-      if (typeof window !== 'undefined' && window.fbq) {
-        window.fbq('track', 'ViewContent', { content_name: 'Myzora' });
-        hasFiredViewContent.current = true;
-      }
-    }
-  }, [id]);
-
   const activeSpec = activeSpecKey 
     ? (id === "canary" ? canaryTypes[activeSpecKey] : id === "derora" ? deroraTypes[activeSpecKey] : id === "easton" ? eastonTypes[activeSpecKey] : id === "weston" ? westonTypes[activeSpecKey] : brassiaTypes[activeSpecKey]) 
     : null;
 
   return (
     <main className="flex min-h-screen flex-col bg-dark-bg pt-20">
+      {activeSpecKey === "myzora-77" && (
+        <ViewContentTracker 
+          contentName="Myzora 77/98" 
+          contentCategory="Residential Property" 
+          contentIds={["myzora-77-98"]} 
+          contentType="product" 
+        />
+      )}
       
       {/* Hero Section */}
       <section className="relative min-h-[60vh] md:min-h-[80vh] flex items-center justify-center pt-24 pb-12 overflow-hidden">

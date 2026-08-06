@@ -3,9 +3,7 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
 import { useEffect, Suspense, useRef } from "react";
-
-const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "1722004259078620"; // Pixel ID from Meta Ads Manager
-
+import { META_PIXEL_ID, pageView } from "@/lib/tracking/metaPixel";
 function MetaPixelLogic() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -14,10 +12,8 @@ function MetaPixelLogic() {
   useEffect(() => {
     const currentUrl = pathname + searchParams.toString();
     if (currentUrl !== lastUrlRef.current) {
-      if (typeof window !== 'undefined' && window.fbq) {
-        window.fbq('track', 'PageView');
-        lastUrlRef.current = currentUrl;
-      }
+      pageView();
+      lastUrlRef.current = currentUrl;
     }
   }, [pathname, searchParams]);
 
@@ -25,6 +21,8 @@ function MetaPixelLogic() {
 }
 
 export default function MetaPixel() {
+  if (!META_PIXEL_ID) return null;
+
   return (
     <>
       <Suspense fallback={null}>
@@ -43,8 +41,7 @@ export default function MetaPixel() {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${PIXEL_ID}');
-            fbq('track', 'PageView');
+            fbq('init', '${META_PIXEL_ID}');
           `,
         }}
       />
@@ -53,7 +50,7 @@ export default function MetaPixel() {
           height="1"
           width="1"
           style={{ display: "none" }}
-          src={`https://www.facebook.com/tr?id=${PIXEL_ID}&ev=PageView&noscript=1`}
+          src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
           alt=""
         />
       </noscript>

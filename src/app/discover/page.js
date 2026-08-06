@@ -10,6 +10,7 @@ import SectionReveal from "@/components/atoms/SectionReveal";
 import ScrollToTop from "@/components/atoms/ScrollToTop";
 import Link from "next/link";
 import { ArrowRight, Home, Briefcase, ChevronLeft } from "lucide-react";
+import { ViewContentTracker } from "@/components/smi/ViewContentTracker";
 
 export const metadata = {
   title: 'Discover Metland Cikarang | Ekosistem Masa Depan',
@@ -43,6 +44,7 @@ const faqs = [
 export default function DiscoverPage() {
   return (
     <main className="min-h-screen bg-dark-bg text-light-text selection:bg-primary/30 selection:text-white pb-20 relative">
+      <ViewContentTracker contentName="Metland Cikarang Discover" contentCategory="Residential Property" />
       
       {/* Back Button */}
       <Link href="/" className="fixed top-6 left-6 sm:top-8 sm:left-8 z-50 flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 bg-black/40 hover:bg-white hover:text-black text-white backdrop-blur-md border border-white/10 hover:border-white rounded-full transition-all duration-300 shadow-2xl group">

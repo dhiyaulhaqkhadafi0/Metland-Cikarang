@@ -44,9 +44,7 @@ export function TrackedWhatsAppButton({
       console.error("Error saat menyimpan tracking:", error);
     } finally {
       // 3. Langsung Redirect ke WhatsApp setelah data dipastikan terkirim
-      if (typeof window !== 'undefined' && (window as any).fbq) {
-        (window as any).fbq('track', 'Contact');
-      }
+      // Meta Pixel Contact event is now handled globally in TrackingProvider
       const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
       window.open(waUrl, '_blank');
       
