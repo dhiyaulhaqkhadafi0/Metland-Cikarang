@@ -63,14 +63,14 @@ export async function saveLeadAction(
       whatsapp_clicked_at: new Date().toISOString()
     };
 
-    const { data, error } = await supabase.from('leads').insert([payload]).select();
+    const { error } = await supabase.from('leads').insert([payload]);
 
     if (error) {
       console.error("Supabase Error saving lead:", error);
       return { success: false, error: error.message };
     }
 
-    return { success: true, data };
+    return { success: true };
   } catch (error: any) {
     console.error("Unexpected error saving lead:", error);
     return { success: false, error: error.message || "Unknown error" };
