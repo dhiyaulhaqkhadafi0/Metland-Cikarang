@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<div align="center">
 
-## Getting Started
+# SMMC Property — Property Discovery Experience
 
-First, run the development server:
+**A real estate discovery and lead-generation web application**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Product thinking · Frontend engineering · Search and discovery · Buyer experience
+
+</div>
+
+---
+
+## Project overview
+
+SMMC Property is a Next.js web project for making residential property discovery more informative and approachable. Its interface brings property exploration, financing education, interactive tools, and inquiry flows into one browsing experience.
+
+This repository documents the **product implementation**. It is not a statement of official endorsement, property availability, or current real estate offers.
+
+## Product features
+
+| Experience | Engineering focus |
+| --- | --- |
+| Property discovery and cluster pages | Browse and understand housing options |
+| Smart property finder | Guided discovery and filtering |
+| Mortgage and investment tools | Interactive financial scenario exploration |
+| Property galleries | Visual storytelling for listings |
+| Lead capture | Clear calls to action and inquiry journeys |
+| Internal dashboard | Workspace for managing supporting operations |
+
+## Tech stack
+
+- **Application:** JavaScript, React, Next.js App Router
+- **Styling & interaction:** Tailwind CSS, Framer Motion, Lucide, Lenis
+- **Data & authentication:** Supabase
+- **Supporting tools:** AI SDK integrations, analytics, PDF/export utilities
+
+## Structure
+
+```text
+src/
+  app/             Page routes, APIs, authentication, dashboard
+  components/
+    atoms/         Small reusable UI pieces
+    molecules/     Composed elements
+    organisms/     Full-page sections
+    kpr/           Financing experiences
+    explore/       Property discovery
+    dashboard/     Management interfaces
+  ...
+public/            Media and static assets
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local development
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```bash
+npm ci
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Use development-only configuration for external integrations. Do not commit credentials, lead/customer records, or downloaded analytics.
 
-## Learn More
+```bash
+npm run lint
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Product engineering notes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The project illustrates how sales-facing domain knowledge can translate into user journeys: discovery → comparison → financing understanding → inquiry. It is an evolving product project, not a claim that every workflow has been independently production-certified.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Builder
 
-## Deploy on Vercel
+**Daffa Dhiyaulhaq Khadafi** — AI-Assisted Product Engineer & Digital Builder.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[Personal site](https://khadafidaffa.com) · [More work](https://github.com/dhiyaulhaqkhadafi0/website)
